@@ -1,0 +1,239 @@
+.login-wrapper{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding-right: 15%;
+    font-family: var(--font-sans), 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ═══ Switch Mode Button ═══ */
+.switch-btn {
+    position: relative;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+.switch-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+.switch-btn:hover  { background: rgba(255,255,255,0.15); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.switch-btn:active { transform: scale(0.97); }
+
+/* ═══ Background Image ═══ */
+.login-background {
+    position: absolute;
+    inset: 0;
+    background-image: url("/Gemini_Generated_Image_qgjz1hqgjz1hqgjz.png");
+    background-size: 100% auto;
+    background-position: center top;
+    background-repeat: no-repeat;
+    animation: subtleZoom 10s forwards;
+}
+@keyframes subtleZoom {
+    0%   { transform: scale(1); background-position: top center;    }
+    100% { transform: scale(1); background-position: center center; }
+}
+.login-background::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+            120deg,
+            rgba(15,23,42,0.85) 0%,
+            rgba(67,56,202,0.55) 0%,
+            rgba(15,23,42,0.9) 100%
+    );
+}
+
+/* ═══ Glass Box ═══ */
+.login-glass-box {
+    background: rgba(15, 23, 42, 0.55); /* دارک شیشه‌ای */
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+    position: relative;
+    z-index: 10;
+    width: 33vw;
+    min-width: 380px;
+    max-width: 480px;
+    padding: 50px 45px;
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+}
+
+/* ═══ Login Header ═══ */
+.login-header { text-align: center; margin-bottom: 35px; }
+.login-header h2 { font-size: 22px;       color: rgba(255,255,255,0.75);
+    font-weight: 500;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2); letter-spacing: 1px; }
+
+/* ═══ Form ═══ */
+.glass-form { width: 100%; }
+
+/* ⭐ form-input-group: فقط margin — position نداره تا error متن جابجایی ایجاد نکنه */
+.form-input-group {
+    margin-bottom: 28px;
+}
+
+/* ⭐ input-wrapper: position:relative — آیکون نسبت به این وسط‌چین میشه */
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* ⭐ آیکون: top:50% نسبت به input-wrapper (نه form-input-group) */
+.input-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    z-index: 1;
+    pointer-events: none;
+    color: rgba(237, 237, 245, 0.55);
+    /* آیکون فقط به input-wrapper وابسته‌ست — error text پایین‌تر جدا هست */
+}
+
+.form-input-group input {
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    color: white;
+    width: 100%;
+    height: 52px;
+    padding: 0 22px 0 50px;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    outline: none;
+    display: block;
+}
+.form-input-group input::placeholder {     color: rgba(255,255,255,0.45);
+ font-weight: 400; }
+
+.form-input-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(84,76,207,0.25);
+    background: rgba(255,255,255,0.12);}
+
+/* ⭐ حالت error — border قرمز روی input */
+.form-input-group input.has-error {
+    border-color: #ef4444 !important;
+    background: rgba(101, 101, 101, 0.06);
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.18);
+}
+
+/* ⭐ متن خطا — زیر input-wrapper، جدا از آیکون */
+.form-error {
+    display: block;
+    margin-top: 6px;
+    padding-right: 4px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #ef4444;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+/* ═══ Remember Me ═══ */
+.remember-row { margin: 20px 0; text-align: right; }
+.remember-label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: rgba(255,255,255,0.95); font-size: 14px; font-weight: 500; }
+.remember-label input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
+
+/* ═══ Submit Button ═══ */
+.glass-submit-btn {
+    width: 100%;
+    height: 54px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(84,76,207,0.5);
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+}
+.glass-submit-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+.glass-submit-btn:hover:not(:disabled)::before { transform: translateX(100%); }
+.glass-submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(84,76,207,0.5); }
+.glass-submit-btn:active:not(:disabled) { transform: translateY(0); }
+.glass-submit-btn:disabled { opacity: 0.75; cursor: not-allowed; }
+.glass-submit-btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 22px; height: 22px;
+    margin: -11px 0 0 -11px;
+    border: 3px solid white;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: btnSpinner 0.7s linear infinite;
+}
+@keyframes btnSpinner { to { transform: rotate(360deg); } }
+
+/* ═══ Forgot Link ═══ */
+.forgot-link { text-align: center; margin-top: 22px; }
+.forgot-link a { color: rgba(255,255,255,0.9); font-size: 13px; text-decoration: none; font-weight: 500; transition: all 0.2s ease; }
+.forgot-link a:hover { color: white; text-decoration: underline; }
+
+/* ═══ Footer ═══ */
+.login-footer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 5; }
+.login-footer p { color: rgba(255,255,255,0.8); font-size: 13px; text-shadow: 0 2px 6px rgba(0,0,0,0.3); font-weight: 500; }
+
+/* ═══ Responsive ═══ */
+@media (max-width: 640px) {
+    .login-glass-box { width: 92%; padding: 40px 30px; }
+    .login-header h2 { font-size: 19px; }
+    .form-input-group input { height: 50px; font-size: 14px; }
+    .glass-submit-btn { height: 50px; font-size: 16px; }
+}
+@media (max-width: 400px) {
+    .login-glass-box { padding: 35px 25px; }
+}
+
+/* ═══ Floating Particles ═══ */
+.login-wrapper::before, .login-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+.login-wrapper::before { top: 10%; left: 5%; animation: floatParticle1 20s ease-in-out infinite; }
+.login-wrapper::after  { bottom: 15%; right: 10%; animation: floatParticle2 25s ease-in-out infinite; }
+@keyframes floatParticle1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px,-30px); } }
+@keyframes floatParticle2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-25px,25px); } }
