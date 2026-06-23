@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# nextjs build
+.next/
+
+# env files
+.env
+.env.local
+
+# ide
+.idea/
+
+# ai tools
+.agentbridge/
+.agent-work/
+
+# archives
+*.zip
