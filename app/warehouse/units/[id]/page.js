@@ -8,10 +8,9 @@ import { faRuler, faArrowLeft, faPen, faSpinner, faCalendar, faHashtag } from '@
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_UNITS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const InfoCard = ({ icon, label, value, iconColor = 'var(--primary)', iconBg = 'var(--primary-light)', delay = 0 }) => (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
@@ -36,7 +35,7 @@ export default function WarehouseUnitShowPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => { setData(res.data?.unit || null); setLoading(false) })
             .catch(() => {

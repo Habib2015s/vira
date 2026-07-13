@@ -9,10 +9,9 @@ import { faRuler, faSave, faArrowLeft, faSpinner } from '@fortawesome/free-solid
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_UNITS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 export default function WarehouseUnitEditPage() {
     const router      = useRouter()
@@ -26,7 +25,7 @@ export default function WarehouseUnitEditPage() {
 
     // GET برای پر کردن فرم
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => {
                 const u = res.data?.unit
@@ -39,7 +38,7 @@ export default function WarehouseUnitEditPage() {
     // PUT /units/{id}
     const mutation = useMutation({
         mutationFn: (body) =>
-            fetch(`${BASE}/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(body) }).then(r => r.json()),
+            fetch(`${BASE}/${id}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(body) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data?.unit) {
                 setSavedData(res.data.unit)   // آپدیت با response جدید

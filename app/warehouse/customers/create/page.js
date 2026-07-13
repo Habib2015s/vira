@@ -10,10 +10,9 @@ import { faUsers, faSave, faArrowLeft, faSpinner, faUser, faBuilding,
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_CUSTOMERS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const ErrorMsg = ({ error }) => error
     ? <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
@@ -43,7 +42,7 @@ export default function CustomerCreatePage() {
 
     const mutation = useMutation({
         mutationFn: (body) =>
-            fetch(BASE, { method: 'POST', headers: HEADERS, body: JSON.stringify(body) }).then(r => r.json()),
+            fetch(BASE, { method: 'POST', headers: getHeaders(), body: JSON.stringify(body) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data?.customer) {
                 queryClient.invalidateQueries({ queryKey: ['warehouseCustomers'] })

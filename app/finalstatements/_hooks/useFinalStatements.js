@@ -4,13 +4,12 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const fetchAll = async ({ pageParam = null }) => {
     const url = pageParam ? `${ENV.API_FINAL_STATEMENTS}?cursor=${pageParam}` : ENV.API_FINAL_STATEMENTS
-    const res = await fetch(url, { headers: HEADERS })
+    const res = await fetch(url, { headers: getHeaders() })
     if (!res.ok) throw new Error('خطا در دریافت لیست')
     return (await res.json()).data.finalStatements
 }
@@ -40,7 +39,7 @@ export function useFinalStatements() {
     }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
     const deleteMutation = useMutation({
-        mutationFn: (id) => fetch(`${ENV.API_FINAL_STATEMENTS}/${id}`, { method: 'DELETE', headers: HEADERS }).then(r => r.json()),
+        mutationFn: (id) => fetch(`${ENV.API_FINAL_STATEMENTS}/${id}`, { method: 'DELETE', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['finalStatements'] })
             Swal.fire({ title: 'حذف شد!', icon: 'success', timer: 2000, showConfirmButton: false })

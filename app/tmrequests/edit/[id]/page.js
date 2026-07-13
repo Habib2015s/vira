@@ -9,10 +9,9 @@ import { faSave, faArrowLeft, faPlus, faTrash, faWrench, faClipboardList, faSpin
 import Select from 'react-select'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_TM_REQUESTS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const selectStyles = {
     control: (b, s) => ({ ...b, minHeight: '40px', background: 'var(--surface)', borderColor: s.isFocused ? 'var(--primary)' : 'var(--border)', borderWidth: '1.5px', borderRadius: 'var(--radius)', boxShadow: s.isFocused ? '0 0 0 3px rgba(84,76,207,0.1)' : 'none' }),
@@ -39,17 +38,17 @@ export default function TmRequestEditPage() {
     // ── لیست‌ها ──────────────────────────────────────
     const { data: repairmenData = [] } = useQuery({
         queryKey: ['repairmen'],
-        queryFn: () => fetch(ENV.API_REPAIRMEN, { headers: HEADERS }).then(r => r.json()).then(r => r.data?.repairmen?.data || []),
+        queryFn: () => fetch(ENV.API_REPAIRMEN, { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.repairmen?.data || []),
         staleTime: 10 * 60 * 1000,
     })
     const { data: shopsData = [] } = useQuery({
         queryKey: ['shops'],
-        queryFn: () => fetch(ENV.API_SHOPS, { headers: HEADERS }).then(r => r.json()).then(r => r.data?.shops?.data || []),
+        queryFn: () => fetch(ENV.API_SHOPS, { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.shops?.data || []),
         staleTime: 10 * 60 * 1000,
     })
     const { data: tmCodesData = [] } = useQuery({
         queryKey: ['tmCodes'],
-        queryFn: () => fetch(ENV.API_TM_CODES, { headers: HEADERS }).then(r => r.json()).then(r => r.data?.tmCodes?.data || []),
+        queryFn: () => fetch(ENV.API_TM_CODES, { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.tmCodes?.data || []),
         staleTime: 10 * 60 * 1000,
     })
 
@@ -59,7 +58,7 @@ export default function TmRequestEditPage() {
 
     // ── GET درخواست ──────────────────────────────────
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => {
                 const existing = res.data?.tmrequest?.infos || []
@@ -77,7 +76,7 @@ export default function TmRequestEditPage() {
     }, [id])
 
     const mutation = useMutation({
-        mutationFn: (body) => fetch(`${BASE}/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(body) }).then(r => r.json()),
+        mutationFn: (body) => fetch(`${BASE}/${id}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(body) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data || res.message) {
                 queryClient.invalidateQueries({ queryKey: ['tmRequests'] })

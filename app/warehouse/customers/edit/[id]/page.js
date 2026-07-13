@@ -9,10 +9,9 @@ import { faUsers, faSave, faArrowLeft, faSpinner, faUser, faBuilding } from '@fo
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_CUSTOMERS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const ErrorMsg = ({ error }) => error
     ? <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
@@ -44,7 +43,7 @@ export default function CustomerEditPage() {
     const [errors, setErrors] = useState({})
 
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => {
                 const c = res.data?.customer
@@ -67,7 +66,7 @@ export default function CustomerEditPage() {
 
     const mutation = useMutation({
         mutationFn: (body) =>
-            fetch(`${BASE}/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(body) }).then(r => r.json()),
+            fetch(`${BASE}/${id}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(body) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data?.customer) {
                 setSavedData(res.data.customer)

@@ -12,10 +12,9 @@ import {
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_REPAIRMEN
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const CONTRACT_LABELS = { have: 'دارد', completion: 'اتمام یافته', no_need: 'نیاز نیست' }
 const CONTRACT_COLORS = {
@@ -49,7 +48,7 @@ export default function RepairmanShowPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => { setData(res.data?.repairman || null); setLoading(false) })
             .catch(() => {

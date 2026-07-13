@@ -8,11 +8,10 @@ import { faUserCog, faSpinner, faSave, faArrowRight } from '@fortawesome/free-so
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE = ENV.API_REPAIRMEN
 
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 export default function RepairmenEditPage() {
     const router = useRouter()
@@ -23,12 +22,12 @@ export default function RepairmenEditPage() {
 
     const { isLoading } = useQuery({
         queryKey: ['repairman', id],
-        queryFn: () => fetch(`${BASE}/${id}`, { headers: HEADERS }).then(r => r.json()),
+        queryFn: () => fetch(`${BASE}/${id}`, { headers: getHeaders() }).then(r => r.json()),
         onSuccess: (res) => { if (res.data?.repairman) setForm({ ...form, ...res.data.repairman }) }
     })
 
     const mutation = useMutation({
-        mutationFn: (data) => fetch(`${BASE}/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(data) }).then(r => r.json()),
+        mutationFn: (data) => fetch(`${BASE}/${id}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(data) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data) {
                 queryClient.invalidateQueries(['repairmen'])

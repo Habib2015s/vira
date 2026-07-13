@@ -11,10 +11,9 @@ import { faFileInvoiceDollar, faArrowLeft, faSpinner, faCheck, faBan,
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_FACTORS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const STATUS_MAP = {
     'pre-invoice': { label: 'پیش‌فاکتور', badge: 'badge-warning' },
@@ -41,7 +40,7 @@ export default function FactorShowPage() {
 
     const load = () => {
         setLoading(true)
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => { setData(res.data?.factor || null); setLoading(false) })
             .catch(() => { Swal.fire({ icon: 'error', title: 'خطا', text: 'دریافت ناموفق' }); setLoading(false) })
@@ -49,22 +48,22 @@ export default function FactorShowPage() {
     useEffect(() => { load() }, [id])
 
     const confirmMutation = useMutation({
-        mutationFn: () => fetch(`${BASE}/${id}/confirm`, { method: 'POST', headers: HEADERS }).then(r => r.json()),
+        mutationFn: () => fetch(`${BASE}/${id}/confirm`, { method: 'POST', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => { Swal.fire({ title: 'تأیید شد!', icon: 'success', timer: 1800, showConfirmButton: false }); load() },
         onError: () => Swal.fire('خطا!', 'عملیات انجام نشد', 'error'),
     })
     const cancelMutation = useMutation({
-        mutationFn: () => fetch(`${BASE}/${id}/cancel`, { method: 'POST', headers: HEADERS }).then(r => r.json()),
+        mutationFn: () => fetch(`${BASE}/${id}/cancel`, { method: 'POST', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => { Swal.fire({ title: 'لغو شد!', icon: 'warning', timer: 1800, showConfirmButton: false }); load() },
         onError: () => Swal.fire('خطا!', 'عملیات انجام نشد', 'error'),
     })
     const deleteItemMutation = useMutation({
-        mutationFn: (itemId) => fetch(`${BASE}/${id}/items/${itemId}`, { method: 'DELETE', headers: HEADERS }).then(r => r.json()),
+        mutationFn: (itemId) => fetch(`${BASE}/${id}/items/${itemId}`, { method: 'DELETE', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => { Swal.fire({ title: 'آیتم حذف شد!', icon: 'success', timer: 1800, showConfirmButton: false }); load() },
         onError: () => Swal.fire('خطا!', 'حذف ناموفق', 'error'),
     })
     const returnItemMutation = useMutation({
-        mutationFn: (itemId) => fetch(`${BASE}/${id}/items/${itemId}/return`, { method: 'POST', headers: HEADERS }).then(r => r.json()),
+        mutationFn: (itemId) => fetch(`${BASE}/${id}/items/${itemId}/return`, { method: 'POST', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => { Swal.fire({ title: 'مرجوع شد!', icon: 'info', timer: 1800, showConfirmButton: false }); load() },
         onError: () => Swal.fire('خطا!', 'مرجوع ناموفق', 'error'),
     })

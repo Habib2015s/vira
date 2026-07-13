@@ -10,10 +10,9 @@ import { faFileInvoiceDollar, faSave, faArrowLeft, faSpinner, faPlus,
 import Select from 'react-select'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_FACTORS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const selectStyles = {
     control: (b, s) => ({
@@ -118,12 +117,12 @@ export default function FactorCreatePage() {
     const [items,        setItems]        = useState([{ product_id: '', storehouse_id: '', single_amount: 0, count: 1, discount: 0 }])
     const [errors,       setErrors]       = useState({})
 
-    const { data: customers  = [] } = useQuery({ queryKey: ['warehouseCustomers'],   queryFn: () => fetch(ENV.API_WAREHOUSE_CUSTOMERS,   { headers: HEADERS }).then(r => r.json()).then(r => r.data?.customers?.data   || []), staleTime: 10 * 60 * 1000 })
-    const { data: products   = [] } = useQuery({ queryKey: ['warehouseProducts'],    queryFn: () => fetch(ENV.API_WAREHOUSE_PRODUCTS,    { headers: HEADERS }).then(r => r.json()).then(r => r.data?.products?.data    || []), staleTime: 10 * 60 * 1000 })
-    const { data: storehouses= [] } = useQuery({ queryKey: ['warehouseStorehouses'], queryFn: () => fetch(ENV.API_WAREHOUSE_STOREHOUSES, { headers: HEADERS }).then(r => r.json()).then(r => r.data?.storehouses?.data || []), staleTime: 10 * 60 * 1000 })
+    const { data: customers  = [] } = useQuery({ queryKey: ['warehouseCustomers'],   queryFn: () => fetch(ENV.API_WAREHOUSE_CUSTOMERS,   { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.customers?.data   || []), staleTime: 10 * 60 * 1000 })
+    const { data: products   = [] } = useQuery({ queryKey: ['warehouseProducts'],    queryFn: () => fetch(ENV.API_WAREHOUSE_PRODUCTS,    { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.products?.data    || []), staleTime: 10 * 60 * 1000 })
+    const { data: storehouses= [] } = useQuery({ queryKey: ['warehouseStorehouses'], queryFn: () => fetch(ENV.API_WAREHOUSE_STOREHOUSES, { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.storehouses?.data || []), staleTime: 10 * 60 * 1000 })
 
     const mutation = useMutation({
-        mutationFn: (body) => fetch(BASE, { method: 'POST', headers: HEADERS, body: JSON.stringify(body) }).then(r => r.json()),
+        mutationFn: (body) => fetch(BASE, { method: 'POST', headers: getHeaders(), body: JSON.stringify(body) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data?.factor) {
                 queryClient.invalidateQueries({ queryKey: ['warehouseFactors'] })

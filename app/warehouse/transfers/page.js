@@ -8,13 +8,12 @@ import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import DataTable from '@/app/components/DataTable/DataTable'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 
 const BASE = ENV.API_WAREHOUSE_TRANSFERS
 
 // const BASE = 'https://viratest2.ir/api/v1/warehouse/transfer_between_storehouses'
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const STATUS_LABEL = { pending: 'در انتظار', approved: 'تأیید', rejected: 'رد شده', imported: 'وارد', exported: 'خارج' }
 const STATUS_STYLE = {
@@ -28,7 +27,7 @@ const STATUS_STYLE = {
 const fetchTransfers = async ({ pageParam = null }) => {
     let url = BASE
     if (pageParam) url += `?cursor=${pageParam}`
-    const res = await fetch(url, { headers: HEADERS })
+    const res = await fetch(url, { headers: getHeaders() })
     if (!res.ok) throw new Error('خطا')
     const result = await res.json()
     return result.data.transfers ?? result.data

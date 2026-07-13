@@ -4,9 +4,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 export function useCreateFinalStatement() {
     const router = useRouter()
@@ -19,7 +18,7 @@ export function useCreateFinalStatement() {
 
     useEffect(() => {
         setLoadingShops(true)
-        fetch(ENV.API_SHOPS, { headers: HEADERS })
+        fetch(ENV.API_SHOPS, { headers: getHeaders() })
             .then(r => r.json())
             .then(r => setShops(r.data?.shops?.data || []))
             .catch(console.error)
@@ -56,7 +55,7 @@ export function useCreateFinalStatement() {
                 shop_name:   formData.shop_name,
                 description: formData.description,
             }
-            const res    = await fetch(ENV.API_FINAL_STATEMENTS, { method: 'POST', headers: HEADERS, body: JSON.stringify(payload) })
+            const res    = await fetch(ENV.API_FINAL_STATEMENTS, { method: 'POST', headers: getHeaders(), body: JSON.stringify(payload) })
             const result = await res.json()
             if (res.ok) {
                 await Swal.fire({ title: 'موفق!', text: 'صورت وضعیت ایجاد شد', icon: 'success', timer: 2000, showConfirmButton: false })

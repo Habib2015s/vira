@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 export function useEditFactor(factorId) {
     const router      = useRouter()
@@ -22,7 +21,7 @@ export function useEditFactor(factorId) {
         if (!factorId) return
 
         // fetch فاکتور
-        fetch(`${ENV.API_FINAL_STATEMENTS_FACTORS}/${factorId}`, { headers: HEADERS })
+        fetch(`${ENV.API_FINAL_STATEMENTS_FACTORS}/${factorId}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(r => {
                 const f = r.data?.finalStatementFactor
@@ -33,7 +32,7 @@ export function useEditFactor(factorId) {
 
         // fetch لیست صورت وضعیت‌ها
         setLoadingStatements(true)
-        fetch(ENV.API_FINAL_STATEMENTS, { headers: HEADERS })
+        fetch(ENV.API_FINAL_STATEMENTS, { headers: getHeaders() })
             .then(r => r.json())
             .then(r => setStatements(r.data?.finalStatements?.data || []))
             .catch(console.error)
@@ -55,7 +54,7 @@ export function useEditFactor(factorId) {
             if (formData.date)               payload.date               = formData.date
             if (formData.final_statement_id) payload.final_statement_id = parseInt(formData.final_statement_id)
 
-            const res    = await fetch(`${ENV.API_FINAL_STATEMENTS_FACTORS}/${factorId}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(payload) })
+            const res    = await fetch(`${ENV.API_FINAL_STATEMENTS_FACTORS}/${factorId}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(payload) })
             const result = await res.json()
             if (res.ok) {
                 queryClient.invalidateQueries({ queryKey: ['factors'] })

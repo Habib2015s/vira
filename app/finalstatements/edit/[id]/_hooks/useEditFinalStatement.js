@@ -5,9 +5,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import moment from 'moment-jalaali'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 export function useEditFinalStatement(id) {
     const router = useRouter()
@@ -23,7 +22,7 @@ export function useEditFinalStatement(id) {
         if (!id) return
 
         // fetch صورت وضعیت
-        fetch(`${ENV.API_FINAL_STATEMENTS}/${id}`, { headers: HEADERS })
+        fetch(`${ENV.API_FINAL_STATEMENTS}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(r => {
                 const s = r.data?.finalStatement
@@ -43,7 +42,7 @@ export function useEditFinalStatement(id) {
 
         // fetch شاپ‌ها
         setLoadingShops(true)
-        fetch(ENV.API_SHOPS, { headers: HEADERS })
+        fetch(ENV.API_SHOPS, { headers: getHeaders() })
             .then(r => r.json())
             .then(r => setShops(r.data?.shops?.data || []))
             .catch(console.error)
@@ -70,7 +69,7 @@ export function useEditFinalStatement(id) {
             if (formData.shop_name)   payload.shop_name   = formData.shop_name
             if (formData.description) payload.description = formData.description
 
-            const res    = await fetch(`${ENV.API_FINAL_STATEMENTS}/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(payload) })
+            const res    = await fetch(`${ENV.API_FINAL_STATEMENTS}/${id}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(payload) })
             const result = await res.json()
             if (res.ok) {
                 await Swal.fire({ title: 'موفق!', text: 'صورت وضعیت ویرایش شد', icon: 'success', timer: 2000, showConfirmButton: false })

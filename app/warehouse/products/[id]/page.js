@@ -14,9 +14,8 @@ import {
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const InfoCard = ({ icon, label, value, iconColor = 'var(--primary)', iconBg = 'var(--primary-light)', delay = 0 }) => (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
@@ -51,19 +50,19 @@ export default function ProductShowPage() {
     // ⭐ fetch storehouses و units برای resolve کردن نام‌ها
     const { data: shData } = useQuery({
         queryKey: ['warehouseStorehouses'],
-        queryFn: () => fetch(ENV.API_WAREHOUSE_STOREHOUSES, { headers: HEADERS }).then(r => r.json()).then(r => r.data?.storehouses?.data || []),
+        queryFn: () => fetch(ENV.API_WAREHOUSE_STOREHOUSES, { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.storehouses?.data || []),
         staleTime: 10 * 60 * 1000,
     })
     const { data: unData } = useQuery({
         queryKey: ['warehouseUnits'],
-        queryFn: () => fetch(ENV.API_WAREHOUSE_UNITS, { headers: HEADERS }).then(r => r.json()).then(r => r.data?.units?.data || []),
+        queryFn: () => fetch(ENV.API_WAREHOUSE_UNITS, { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.units?.data || []),
         staleTime: 10 * 60 * 1000,
     })
     const storeMap = Object.fromEntries((shData || []).map(s => [s.id, s.name]))
     const unitMap  = Object.fromEntries((unData  || []).map(u => [u.id, u.name]))
 
     useEffect(() => {
-        fetch(`${ENV.API_WAREHOUSE_PRODUCTS}/${id}`, { headers: HEADERS })
+        fetch(`${ENV.API_WAREHOUSE_PRODUCTS}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => { setData(res.data?.product || null); setLoading(false) })
             .catch(() => {

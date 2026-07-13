@@ -10,10 +10,9 @@ import { faWarehouse, faSave, faArrowLeft, faSpinner,
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_STOREHOUSES
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const fields = [
     { key: 'code',    label: 'کد انبار', icon: faHashtag,     iconColor: 'var(--primary)', iconBg: 'var(--primary-light)',  required: true },
@@ -34,7 +33,7 @@ export default function StorehouseEditPage() {
 
     // ── GET ──────────────────────────────────────────
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => {
                 const s = res.data?.storehouse
@@ -51,7 +50,7 @@ export default function StorehouseEditPage() {
     // ── PUT ──────────────────────────────────────────
     const mutation = useMutation({
         mutationFn: (body) =>
-            fetch(`${BASE}/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(body) }).then(r => r.json()),
+            fetch(`${BASE}/${id}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(body) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data?.storehouse) {
                 queryClient.invalidateQueries({ queryKey: ['warehouseStorehouses'] })

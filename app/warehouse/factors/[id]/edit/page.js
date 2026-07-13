@@ -10,10 +10,9 @@ import { faFileInvoiceDollar, faSave, faArrowLeft, faSpinner,
     faTimes, faCircleCheck, faCircleXmark, faPen, faMoneyBill } from '@fortawesome/free-solid-svg-icons'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_FACTORS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const STATUS_MAP = {
     'pre-invoice': { label: 'پیش‌فاکتور', badge: 'badge-warning' },
@@ -206,7 +205,7 @@ export default function FactorEditPage() {
     // GET /factors/{id} — این endpoint هم ممکنه 500 بده
     // از cache لیست fallback میکنیم
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => {
                 const f = res.data?.factor
@@ -249,7 +248,7 @@ export default function FactorEditPage() {
 
     const mutation = useMutation({
         mutationFn: (body) =>
-            fetch(`${BASE}/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(body) }).then(r => r.json()),
+            fetch(`${BASE}/${id}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(body) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data?.factor || (res.message?.[0] === 'عملیات با موفقیت انجام شد') || (res.message && !res.errors && typeof res.message === 'string' && res.message.includes('موفق'))) {
                 queryClient.invalidateQueries({ queryKey: ['warehouseFactors'] })

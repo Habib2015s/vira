@@ -12,10 +12,9 @@ import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 import DataTable from '@/app/components/DataTable/DataTable'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_FACTORS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const STATUS_MAP = {
     'pre-invoice': { label: 'پیش‌فاکتور', badge: 'badge-warning'  },
@@ -27,7 +26,7 @@ const STATUS_MAP = {
 const fetchFactors = async ({ pageParam = null }) => {
     let url = BASE
     if (pageParam) url += `?cursor=${pageParam}`
-    const res = await fetch(url, { headers: HEADERS })
+    const res = await fetch(url, { headers: getHeaders() })
     if (!res.ok) throw new Error('خطا')
     return (await res.json()).data.factors
 }
@@ -46,12 +45,12 @@ export default function FactorsPage() {
 
     // ── mutations ─────────────────────────────────────
     const confirmMutation = useMutation({
-        mutationFn: (id) => fetch(`${BASE}/${id}/confirm`, { method: 'POST', headers: HEADERS }).then(r => r.json()),
+        mutationFn: (id) => fetch(`${BASE}/${id}/confirm`, { method: 'POST', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['warehouseFactors'] }); Swal.fire({ title: 'تأیید شد!', icon: 'success', timer: 2000, showConfirmButton: false }) },
         onError: () => Swal.fire('خطا!', 'عملیات انجام نشد', 'error'),
     })
     const cancelMutation = useMutation({
-        mutationFn: (id) => fetch(`${BASE}/${id}/cancel`, { method: 'POST', headers: HEADERS }).then(r => r.json()),
+        mutationFn: (id) => fetch(`${BASE}/${id}/cancel`, { method: 'POST', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['warehouseFactors'] }); Swal.fire({ title: 'لغو شد!', icon: 'warning', timer: 2000, showConfirmButton: false }) },
         onError: () => Swal.fire('خطا!', 'عملیات انجام نشد', 'error'),
     })

@@ -11,11 +11,10 @@ import { faClipboardList, faSpinner, faArrowLeft, faPen, faCog, faUser,
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 import Select from 'react-select'
 
 const BASE    = ENV.API_TM_REQUESTS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const STATUS_LABEL = { request: 'درخواست', waiting: 'در انتظار', accepted: 'پذیرفته', rejected: 'رد شده', departure: 'ترخیص' }
 const STATUS_BADGE = { request: 'badge-muted', waiting: 'badge-warning', accepted: 'badge-success', rejected: 'badge-danger', departure: 'badge-info' }
@@ -40,7 +39,7 @@ export default function TmRequestShowPage() {
 
     const load = () => {
         setLoading(true)
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => { setData(res.data?.tmrequest || null); setLoading(false) })
             .catch(() => { Swal.fire({ icon: 'error', title: 'خطا', text: 'دریافت ناموفق' }); setLoading(false) })
@@ -50,13 +49,13 @@ export default function TmRequestShowPage() {
     // fetch repairmen برای نمایش نام مکانیزم و راننده
     const { data: repairmenData = [] } = useQuery({
         queryKey: ['repairmen'],
-        queryFn: () => fetch(ENV.API_REPAIRMEN, { headers: HEADERS }).then(r => r.json()).then(r => r.data?.repairmen?.data || []),
+        queryFn: () => fetch(ENV.API_REPAIRMEN, { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.repairmen?.data || []),
         staleTime: 10 * 60 * 1000,
     })
     const repairmanMap = Object.fromEntries(repairmenData.map(r => [r.id, `${r.name} ${r.family || ''}`]))
 
     const statusMutation = useMutation({
-        mutationFn: (action) => fetch(`${BASE}/${id}/${action}`, { method: 'PATCH', headers: HEADERS }).then(r => r.json()),
+        mutationFn: (action) => fetch(`${BASE}/${id}/${action}`, { method: 'PATCH', headers: getHeaders() }).then(r => r.json()),
         onSuccess: (_, action) => {
             const labels = { reject: 'رد شد', toWaiting: 'به انتظار رفت', toDeparture: 'ترخیص شد', rollbackToAccepted: 'بازگشت به پذیرفته' }
             Swal.fire({ title: labels[action] || 'انجام شد', icon: 'success', timer: 1800, showConfirmButton: false })
@@ -65,7 +64,7 @@ export default function TmRequestShowPage() {
         onError: () => Swal.fire('خطا!', 'عملیات انجام نشد', 'error'),
     })
     const deleteMutation = useMutation({
-        mutationFn: () => fetch(`${BASE}/${id}`, { method: 'DELETE', headers: HEADERS }).then(r => r.json()),
+        mutationFn: () => fetch(`${BASE}/${id}`, { method: 'DELETE', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tmRequests'] })
             Swal.fire({ title: 'حذف شد!', icon: 'success', timer: 1800, showConfirmButton: false })
@@ -76,12 +75,12 @@ export default function TmRequestShowPage() {
     const deleteInfoMutation = useMutation({
         mutationFn: (infoId) =>
             fetch(`https://viratest2.ir/api/v1/repairshops/tmRequests/info/${infoId}/deleteInfo`,
-                { method: 'DELETE', headers: HEADERS }).then(r => r.json()),
+                { method: 'DELETE', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => { Swal.fire({ title: 'قلم حذف شد!', icon: 'success', timer: 1800, showConfirmButton: false }); load() },
         onError: () => Swal.fire('خطا!', 'حذف قلم ناموفق', 'error'),
     })
     const setFsMutation = useMutation({
-        mutationFn: (body) => fetch(ENV.API_TM_REQUESTS_SET_FINAL_STATEMENT, { method: 'POST', headers: HEADERS, body: JSON.stringify(body) }).then(r => r.json()),
+        mutationFn: (body) => fetch(ENV.API_TM_REQUESTS_SET_FINAL_STATEMENT, { method: 'POST', headers: getHeaders(), body: JSON.stringify(body) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data || res.message) { setFsModal(false); Swal.fire({ title: 'صورت وضعیت ست شد!', icon: 'success', timer: 2000, showConfirmButton: false }); load() }
             else Swal.fire({ icon: 'error', title: 'خطا', text: res.message || 'خطایی رخ داد' })
@@ -92,7 +91,7 @@ export default function TmRequestShowPage() {
     const { data: finalStatements = [] } = useQuery({
         queryKey: ['finalStatements'],
         queryFn: () =>
-            fetch(ENV.API_FINAL_STATEMENTS, { headers: HEADERS })
+            fetch(ENV.API_FINAL_STATEMENTS, { headers: getHeaders() })
                 .then(r => r.json())
                 .then(r => r.data?.finalStatements?.data || []),
         staleTime: 10 * 60 * 1000,

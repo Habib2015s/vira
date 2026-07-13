@@ -9,9 +9,8 @@ import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
 import { useQueryClient } from '@tanstack/react-query'
 import Select from 'react-select'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 export default function CreateTmCodePage() {
     const queryClient = useQueryClient()
@@ -30,8 +29,8 @@ export default function CreateTmCodePage() {
     useEffect(() => {
         // fetch شاپ‌ها و گروه‌های PM همزمان
         Promise.all([
-            fetch(ENV.API_SHOPS,    { headers: HEADERS }).then(r => r.json()),
-            fetch(ENV.API_SHOPS.replace('/shops', '/pmGroups'), { headers: HEADERS }).then(r => r.json()),
+            fetch(ENV.API_SHOPS,    { headers: getHeaders() }).then(r => r.json()),
+            fetch(ENV.API_SHOPS.replace('/shops', '/pmGroups'), { headers: getHeaders() }).then(r => r.json()),
         ]).then(([shopsRes, groupsRes]) => {
             setShops(shopsRes.data?.shops?.data || [])
             setPmGroups(groupsRes.data?.pmGroups?.data || [])
@@ -64,7 +63,7 @@ export default function CreateTmCodePage() {
         try {
             setLoading(true)
             const res = await fetch(ENV.API_TM_CODES, {
-                method: 'POST', headers: HEADERS,
+                method: 'POST', headers: getHeaders(),
                 body: JSON.stringify({
                     code:               formData.code,
                     title:              formData.title,

@@ -9,10 +9,9 @@ import { faLayerGroup, faSpinner, faSave, faArrowLeft, faCode, faCog } from '@fo
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_PM_GROUPS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 // ── InfoRow — نمایش داده‌های response ──
 const InfoRow = ({ label, value }) => (
@@ -43,7 +42,7 @@ export default function PmGroupEditPage() {
 
     // ── GET برای پر کردن اولیه فرم ──
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => {
                 const g = res.data?.pmGroup
@@ -65,7 +64,7 @@ export default function PmGroupEditPage() {
     // ── PUT /pmGroups/{id} ──
     const mutation = useMutation({
         mutationFn: (body) =>
-            fetch(`${BASE}/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(body) })
+            fetch(`${BASE}/${id}`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(body) })
                 .then(r => r.json()),
 
         onSuccess: (res) => {

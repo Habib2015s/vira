@@ -11,10 +11,9 @@ import {
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_STOREHOUSES
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 // ── تشخیص تم برای رنگ‌های پویا ─────────────────────
 function useIsDark() {
@@ -46,7 +45,7 @@ export default function StorehouseShowPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => { setData(res.data?.storehouse || null); setLoading(false) })
             .catch(() => {

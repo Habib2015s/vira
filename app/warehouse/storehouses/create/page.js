@@ -9,10 +9,9 @@ import { faWarehouse, faSave, faArrowLeft, faSpinner, faHashtag, faTag, faPhone,
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_STOREHOUSES
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 // ── فیلد با آیکون ──────────────────────────────────
 const FormField = ({ icon, iconColor, iconBg, label, required, children, error }) => (
@@ -42,7 +41,7 @@ export default function StorehouseCreatePage() {
 
     const mutation = useMutation({
         mutationFn: (body) =>
-            fetch(BASE, { method: 'POST', headers: HEADERS, body: JSON.stringify(body) }).then(r => r.json()),
+            fetch(BASE, { method: 'POST', headers: getHeaders(), body: JSON.stringify(body) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data?.storehouse) {
                 queryClient.invalidateQueries({ queryKey: ['warehouseStorehouses'] })

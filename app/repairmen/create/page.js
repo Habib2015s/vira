@@ -8,11 +8,10 @@ import { faUserCog, faSpinner, faSave, faArrowRight } from '@fortawesome/free-so
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE = ENV.API_REPAIRMEN
 
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 export default function RepairmenCreatePage() {
     const router = useRouter()
@@ -23,7 +22,7 @@ export default function RepairmenCreatePage() {
     const [errors, setErrors] = useState({})
 
     const mutation = useMutation({
-        mutationFn: (data) => fetch(BASE, { method: 'POST', headers: HEADERS, body: JSON.stringify(data) }).then(r => r.json()),
+        mutationFn: (data) => fetch(BASE, { method: 'POST', headers: getHeaders(), body: JSON.stringify(data) }).then(r => r.json()),
         onSuccess: (res) => {
             if (res.data) {
                 Swal.fire({ title: 'ثبت شد!', text: 'تعمیرکار جدید اضافه شد', icon: 'success', timer: 2000, showConfirmButton: false })

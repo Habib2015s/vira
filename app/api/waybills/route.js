@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 const BASE         = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://viratest2.ir'
 const WAYBILLS_URL = `${BASE}/api/v1/waybills`
-const HEADERS      = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+
 
 // ── GET /api/waybills ─────────────────────────────────
 export async function GET(request) {

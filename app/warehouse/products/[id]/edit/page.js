@@ -7,10 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faArrowLeft, faBox, faSpinner, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 import PersianDatePicker from '@/app/components/shared/PersianDatePicker'
 
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 const ErrorMsg = ({ error }) => {
     if (!error) return null
@@ -54,9 +53,9 @@ export default function EditProductPage() {
 
     useEffect(() => {
         Promise.all([
-            fetch(`${ENV.API_WAREHOUSE_PRODUCTS}/${id}`, { headers: HEADERS }).then(r => r.json()),
-            fetch(ENV.API_WAREHOUSE_STOREHOUSES,         { headers: HEADERS }).then(r => r.json()),
-            fetch(ENV.API_WAREHOUSE_UNITS,               { headers: HEADERS }).then(r => r.json()),
+            fetch(`${ENV.API_WAREHOUSE_PRODUCTS}/${id}`, { headers: getHeaders() }).then(r => r.json()),
+            fetch(ENV.API_WAREHOUSE_STOREHOUSES,         { headers: getHeaders() }).then(r => r.json()),
+            fetch(ENV.API_WAREHOUSE_UNITS,               { headers: getHeaders() }).then(r => r.json()),
         ]).then(([prod, sh, un]) => {
             setStorehouses(sh.data?.storehouses?.data || [])
             setUnits(un.data?.units?.data || [])
@@ -110,7 +109,7 @@ export default function EditProductPage() {
             intFields.forEach(k => { if (form[k] !== '') body[k] = parseInt(form[k]) })
 
             const res    = await fetch(`${ENV.API_WAREHOUSE_PRODUCTS}/${id}`, {
-                method: 'PUT', headers: HEADERS, body: JSON.stringify(body)
+                method: 'PUT', headers: getHeaders(), body: JSON.stringify(body)
             })
             const result = await res.json()
 

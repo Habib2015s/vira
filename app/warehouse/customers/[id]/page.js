@@ -9,10 +9,9 @@ import { faUsers, faArrowLeft, faPen, faSpinner, faUser, faBuilding,
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import Swal from 'sweetalert2'
-import { ENV } from '@/app/config/env'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_CUSTOMERS
-const HEADERS = { 'Content-Type': 'application/json', 'Accept': 'application/json' }
 
 // ── hook تشخیص دارک مود ────────────────────────────
 function useIsDark() {
@@ -55,7 +54,7 @@ export default function CustomerShowPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch(`${BASE}/${id}`, { headers: HEADERS })
+        fetch(`${BASE}/${id}`, { headers: getHeaders() })
             .then(r => r.json())
             .then(res => { setData(res.data?.customer || null); setLoading(false) })
             .catch(() => {
