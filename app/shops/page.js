@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faSpinner, faStore } from '@fortawesome/free-solid-svg-icons'
 import DashboardLayout from '@/app/dashboard/Dashboardlayout'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { useShops } from '@/app/hooks/useShops'
 import { getShopsColumns } from './_components/ShopsColumns'
 
@@ -35,41 +36,25 @@ export default function ShopsPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
+                <div className="page-content">
 
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                 style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                <FontAwesomeIcon icon={faStore} className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">مدیریت شاپ‌ها</h1>
-                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                                    لیست و مدیریت شاپ‌های داخلی و خارجی
-                                </p>
-                            </div>
-                        </div>
-                        <button onClick={() => router.push('/shops/create')} className="btn btn-success">
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb icon={faStore} root="شاپ‌ها" current="لیست شاپ‌ها" />
+                        <button onClick={() => router.push('/shops/create')} className="btn btn-primary">
                             <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                             افزودن شاپ
                         </button>
                     </div>
-                </div>
 
-                <div className="p-6 max-w-7xl mx-auto">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
                         <DataTable
                             data={shops}
                             columns={columns}
                             loading={loading}
                             emptyMessage="شاپی یافت نشد"
-                            title="لیست شاپ‌ها"
-                            titleIcon={faStore}
                         />
                     </motion.div>
                 </div>
-
             </div>
         </DashboardLayout>
     )

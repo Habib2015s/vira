@@ -92,7 +92,7 @@ function FlyoutMenu({ item, isActive, onNavigate }) {
     return (
         <div ref={wrapRef} className="relative" onMouseEnter={show} onMouseLeave={hide}>
             <div className="w-full h-10 flex items-center justify-center rounded-xl cursor-pointer transition-all"
-                 style={{ background: isActive ? 'var(--primary)' : 'transparent', color: isActive ? '#fff' : 'var(--text-soft)', boxShadow: isActive ? '0 2px 8px rgba(79,70,229,0.2)' : 'none' }}
+                 style={{ background: isActive ? 'var(--surface-2)' : 'transparent', color: isActive ? 'var(--text)' : 'var(--text-soft)', border: isActive ? '1px solid var(--border-strong)' : '1px solid transparent' }}
                  onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--surface-2)' }}
                  onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
                  onClick={() => { if (hasSubmenu) router.push(item.submenu[0].path); else if (item.path) router.push(item.path) }}>
@@ -253,19 +253,33 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                                         <div key={item.id}>
                                             {hasSubmenu ? (
                                                 <button onClick={() => toggleMenu(item.id)}
-                                                        className="w-full flex items-center h-10 px-3 rounded-xl transition-all hover:bg-[var(--surface-2)] justify-between"
-                                                        style={{ background: isActive ? 'var(--primary)' : 'transparent', color: isActive ? '#fff' : 'var(--text-soft)', boxShadow: isActive ? '0 2px 8px rgba(79,70,229,0.2)' : 'none' }}>
+                                                        className="w-full flex items-center h-10 px-3 rounded-xl transition-all justify-between"
+                                                        style={{
+                                                            background: isActive ? 'var(--surface-2)' : 'transparent',
+                                                            color: isActive ? 'var(--text)' : 'var(--text-soft)',
+                                                            fontWeight: isActive ? 700 : 500,
+                                                            borderRight: isActive ? '3px solid var(--primary)' : '3px solid transparent',
+                                                        }}
+                                                        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--surface-2)' }}
+                                                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}>
                                                     <div className="flex items-center gap-3 min-w-0">
                                                         <FontAwesomeIcon icon={item.icon} className="w-4 h-4 shrink-0" />
                                                         <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="font-semibold text-sm truncate">{item.label}</motion.span>
                                                     </div>
                                                     <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 shrink-0 transition-transform duration-200"
-                                                                     style={{ transform: isMenuOpen ? 'rotate(0deg)' : 'rotate(-90deg)', opacity: isActive ? 0.7 : 1 }} />
+                                                                     style={{ transform: isMenuOpen ? 'rotate(0deg)' : 'rotate(-90deg)', opacity: 0.6 }} />
                                                 </button>
                                             ) : (
                                                 <Link href={item.path} onClick={() => { saveScroll(); handleMobileClose() }}>
-                                                    <div className="flex items-center h-10 px-3 gap-3 rounded-xl transition-all hover:bg-[var(--surface-2)]"
-                                                         style={{ background: isActive ? 'var(--primary)' : 'transparent', color: isActive ? '#fff' : 'var(--text-soft)', boxShadow: isActive ? '0 2px 8px rgba(79,70,229,0.2)' : 'none' }}>
+                                                    <div className="flex items-center h-10 px-3 gap-3 rounded-xl transition-all"
+                                                         style={{
+                                                             background: isActive ? 'var(--surface-2)' : 'transparent',
+                                                             color: isActive ? 'var(--text)' : 'var(--text-soft)',
+                                                             fontWeight: isActive ? 700 : 500,
+                                                             borderRight: isActive ? '3px solid var(--primary)' : '3px solid transparent',
+                                                         }}
+                                                         onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--surface-2)' }}
+                                                         onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}>
                                                         <FontAwesomeIcon icon={item.icon} className="w-4 h-4 shrink-0" />
                                                         <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="font-semibold text-sm truncate">{item.label}</motion.span>
                                                     </div>

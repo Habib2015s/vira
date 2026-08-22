@@ -5,31 +5,33 @@
    ═══════════════════════════════════════════════════ */
 
 :root {
-    --primary:        #544ccf;
-    --primary-hover:  #4338ca;
-    --primary-light:  #e0e7ff;
-    --primary-subtle: #f5f3ff;
-    --primary-dark:   #3730a3;
+    /* ── مونوکروم: مشکی / سفید / خاکستری ── */
+    --primary:        #18181b;
+    --primary-hover:  #000000;
+    --primary-light:  #e4e4e7;
+    --primary-subtle: #f4f4f5;
+    --primary-dark:   #09090b;
 
-    --success:        #059669;
-    --success-light:  #d1fae5;
+    /* ── وضعیت‌ها (فقط برای شاخص‌های آماری/چارت نگه داشته شده) ── */
+    --success:        #16a34a;
+    --success-light:  #dcfce7;
     --warning:        #d97706;
     --warning-light:  #fef3c7;
     --danger:         #dc2626;
     --danger-light:   #fee2e2;
-    --info:           #0284c7;
-    --info-light:     #e0f2fe;
+    --info:           #52525b;
+    --info-light:     #f4f4f5;
 
-    --bg:             #f8fafc;
+    --bg:             #f4f4f5;
     --surface:        #ffffff;
-    --surface-2:      #f1f5f9;
-    --border:         #e2e8f0;
-    --border-strong:  #cbd5e1;
-    --muted:          #94a3b8;
+    --surface-2:      #f4f4f5;
+    --border:         #e4e4e7;
+    --border-strong:  #d4d4d8;
+    --muted:          #a1a1aa;
 
-    --text:           #1e293b;
-    --text-soft:      #475569;
-    --text-muted:     #64748b;
+    --text:           #18181b;
+    --text-soft:      #52525b;
+    --text-muted:     #71717a;
 
     --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
     --shadow:     0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
@@ -55,11 +57,11 @@
    ═══════════════════════════════════════════════════ */
 
 .dark, [data-theme="dark"] {
-    --primary:        #7c72e0;
-    --primary-hover:  #6d62d4;
-    --primary-light:  #1e1b4b;
-    --primary-subtle: #1a1740;
-    --primary-dark:   #a5b4fc;
+    --primary:        #e4e4e7;
+    --primary-hover:  #ffffff;
+    --primary-light:  #27272a;
+    --primary-subtle: #1f1f22;
+    --primary-dark:   #f4f4f5;
 
     --success:        #34d399;
     --success-light:  #052e16;
@@ -67,19 +69,19 @@
     --warning-light:  #1c1200;
     --danger:         #f87171;
     --danger-light:   #2d0a0a;
-    --info:           #38bdf8;
-    --info-light:     #082030;
+    --info:           #a1a1aa;
+    --info-light:     #27272a;
 
-    --bg:             #0d1117;
-    --surface:        #161b22;
-    --surface-2:      #1e2733;
-    --border:         #2a3444;
-    --border-strong:  #3a4757;
-    --muted:          #4b5e74;
+    --bg:             #0a0a0b;
+    --surface:        #131316;
+    --surface-2:      #1c1c20;
+    --border:         #29292e;
+    --border-strong:  #3a3a40;
+    --muted:          #52525b;
 
-    --text:           #e2e8f0;
-    --text-soft:      #94a3b8;
-    --text-muted:     #64748b;
+    --text:           #f4f4f5;
+    --text-soft:      #a1a1aa;
+    --text-muted:     #71717a;
 
     --shadow-sm:  0 1px 3px rgba(0,0,0,0.3),  0 1px 2px rgba(0,0,0,0.2);
     --shadow:     0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.25);
@@ -180,35 +182,49 @@ body {
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
-.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 1px 3px rgba(84,76,207,0.3); }
-.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); box-shadow: 0 4px 12px rgba(84,76,207,0.35); transform: translateY(-1px); }
+/* ══════ دسته‌بندی رنگ دکمه‌ها ══════
+   سبز  (btn-success)                → ثبت / ذخیره / ایجاد / تایید
+   قرمز (btn-danger)                 → حذف
+   زرد  (btn-warning, btn-back, btn-ghost) → ویرایش / انصراف / بازگشت
+   مشکی (btn-primary)                → اکشن‌های خنثی/عمومی
+   خاکستری (btn-secondary)           → اکشن‌های ثانویه
+   ═══════════════════════════════════ */
+
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 1px 3px rgba(24,24,27,0.3); }
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); box-shadow: 0 4px 12px rgba(24,24,27,0.35); transform: translateY(-1px); }
 .btn-primary:active { transform: translateY(0); }
-.dark .btn-primary, [data-theme="dark"] .btn-primary { box-shadow: 0 1px 3px rgba(124,114,224,0.4); }
-.dark .btn-primary:hover, [data-theme="dark"] .btn-primary:hover { box-shadow: 0 4px 12px rgba(124,114,224,0.5); }
+.dark .btn-primary, [data-theme="dark"] .btn-primary { box-shadow: 0 1px 3px rgba(228,228,231,0.15); color: #000; }
+.dark .btn-primary:hover, [data-theme="dark"] .btn-primary:hover { box-shadow: 0 4px 12px rgba(228,228,231,0.25); color: #000; }
 
-.btn-success { background: #10b981; color: #fff; border-color: #10b981; box-shadow: 0 1px 3px rgba(16,185,129,0.25); }
-.btn-success:hover { background: #059669; border-color: #059669; box-shadow: 0 4px 12px rgba(16,185,129,0.35); transform: translateY(-1px); }
+/* ─── سبز: ثبت / ذخیره / ایجاد ─── */
+.btn-success { background: #16a34a; color: #fff; border-color: #16a34a; box-shadow: 0 1px 3px rgba(22,163,74,0.25); }
+.btn-success:hover { background: #15803d; border-color: #15803d; box-shadow: 0 4px 12px rgba(22,163,74,0.35); transform: translateY(-1px); }
 
+/* ─── قرمز: حذف ─── */
 .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); box-shadow: 0 1px 3px rgba(220,38,38,0.25); }
 .btn-danger:hover { background: #b91c1c; border-color: #b91c1c; box-shadow: 0 4px 12px rgba(220,38,38,0.35); transform: translateY(-1px); }
 .dark .btn-danger:hover, [data-theme="dark"] .btn-danger:hover { background: #ef4444; border-color: #ef4444; }
 
-.btn-warning { background: #0b4df5; color: #fff; border-color: #0a3077; box-shadow: 0 1px 3px rgba(245,158,11,0.25); }
-.btn-warning:hover { background: #04166e; border-color: #041981; box-shadow: 0 4px 12px rgba(2,6,26,0.35); transform: translateY(-1px); }
+/* ─── زرد: ویرایش ─── */
+.btn-warning { background: #f59e0b; color: #1c1200; border-color: #f59e0b; box-shadow: 0 1px 3px rgba(245,158,11,0.3); }
+.btn-warning:hover { background: #d97706; border-color: #d97706; box-shadow: 0 4px 12px rgba(245,158,11,0.4); transform: translateY(-1px); }
 
 .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
 .btn-secondary:hover { background: var(--surface-2); border-color: var(--muted); }
 
-.btn-back { background: #c8a700; color: #ffffff; border-color: #c8b700; }
-.btn-back:hover { background: #a87e00; box-shadow: 0 4px 12px rgba(200,153,0,0.4); transform: translateY(-1px); cursor: pointer; }
+/* ─── زرد: بازگشت ─── */
+.btn-back { background: #f59e0b; color: #1c1200; border-color: #f59e0b; }
+.btn-back:hover { background: #d97706; box-shadow: 0 4px 12px rgba(245,158,11,0.4); transform: translateY(-1px); cursor: pointer; }
 
-.btn-ghost { color: #ffffff; background: #cc0000; border-color: #cc0000; }
-.btn-ghost:hover { background: #930303; box-shadow: 0 4px 12px rgba(166,5,5,0.4); transform: translateY(-1px); cursor: pointer; }
+/* ─── زرد (outline): انصراف ─── */
+.btn-ghost { color: #92400e; background: #fef3c7; border-color: #fcd34d; }
+.btn-ghost:hover { background: #fde68a; border-color: #f59e0b; box-shadow: 0 4px 12px rgba(245,158,11,0.25); transform: translateY(-1px); cursor: pointer; }
 
 .btn-sm { height: 32px; padding: 0 12px; font-size: 12.5px; border-radius: var(--radius-sm); }
 .btn-lg { height: 46px; padding: 0 24px; font-size: 15px; border-radius: var(--radius-md); }
 .btn-icon { width: 40px; padding: 0; }
 .btn-icon.btn-sm { width: 32px; }
+
 
 .action-btn {
     width: 36px; height: 36px;
@@ -242,7 +258,7 @@ body {
 .form-input:hover, .form-select:hover { border-color: var(--border-strong); }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(84,76,207,0.1);
+    box-shadow: 0 0 0 3px rgba(24,24,27,0.1);
 }
 .dark .form-input:focus, .dark .form-select:focus, .dark .form-textarea:focus,
 [data-theme="dark"] .form-input:focus, [data-theme="dark"] .form-select:focus, [data-theme="dark"] .form-textarea:focus {
@@ -283,14 +299,19 @@ body {
    📊 TABLE
    ═══════════════════════════════════════════════════ */
 
-.data-table { background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--border); }
+.data-table { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; border: 1px solid var(--border); width: 100%; }
 .data-table table { width: 100%; border-collapse: collapse; }
 .data-table thead { background: var(--surface-2); }
 .data-table th { padding: 11px 16px; text-align: right; font-weight: 700; font-size: 12.5px; color: var(--text-soft); border-bottom: 1.5px solid var(--border); white-space: nowrap; }
 .data-table td { padding: 12px 16px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; text-align: right; }
 .data-table tbody tr:last-child td { border-bottom: none; }
 .data-table tbody tr:hover td { background: var(--surface-2); }
-.dark .data-table tbody tr:hover td, [data-theme="dark"] .data-table tbody tr:hover td { background: #1e2733; }
+.dark .data-table tbody tr:hover td, [data-theme="dark"] .data-table tbody tr:hover td { background: #1c1c20; }
+
+/* ── دکمه‌های آیکون ساده (مثل رفرنس: مداد/سطل‌زباله بدون پس‌زمینه رنگی) ── */
+.icon-action { width: 30px; height: 30px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border); background: var(--surface); color: var(--text-soft); transition: all .15s; cursor: pointer; }
+.icon-action:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
+.icon-action.danger:hover { color: var(--danger); border-color: var(--danger); background: var(--danger-light); }
 
 /* ═══════════════════════════════════════════════════
    🗂️ CARD
@@ -307,17 +328,29 @@ body {
    ═══════════════════════════════════════════════════ */
 
 .page-header-bar {
-    background: linear-gradient(135deg, #06b6d4 0%, #4f46e5 100%);
-    padding: 20px 32px;
+    background: #18181b;
+    padding: 14px 24px;
     box-shadow: var(--shadow-md);
 }
 .dark .page-header-bar, [data-theme="dark"] .page-header-bar {
-    background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);
+    background: #000000;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
-.page-content { padding: 24px 32px; max-width: 1280px; margin: 0 auto; }
+.page-content { padding: 18px 12px 20px 20px; max-width: 100%; margin: 0; } /* padding-right کوچیک چون سمت راست به سایدبار می‌چسبد */
 .page-title { font-size: 22px; font-weight: 800; color: var(--text); }
 .page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Breadcrumb داخل کانتنت (شاپ‌ها → لیست شاپ‌ها) ── */
+.crumb-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.crumb-bar .crumb-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--primary-light); color: var(--primary); flex-shrink: 0;
+}
+.crumb-bar .crumb-text { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.crumb-bar .crumb-root { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.crumb-bar .crumb-sep  { font-size: 12px; color: var(--muted); }
+.crumb-bar .crumb-current { font-size: 16px; font-weight: 800; color: var(--text); }
 
 /* ═══════════════════════════════════════════════════
    🔔 ALERT
@@ -405,7 +438,7 @@ body {
     outline: 2px solid var(--primary) !important;
     outline-offset: 2px !important;
 }
-.swal2-timer-progress-bar { background: rgba(84,76,207,0.5) !important; }
+.swal2-timer-progress-bar { background: rgba(24,24,27,0.5) !important; }
 
 /* ── لایت مود Swal ── */
 .swal2-popup {

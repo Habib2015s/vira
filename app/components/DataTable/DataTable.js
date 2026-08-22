@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faTimes, faFilter, faMagnifyingGlass, faLayerGroup, faCheck, faSliders } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faTimes, faFilter, faMagnifyingGlass, faLayerGroup, faCheck, faSliders, faFileExport } from '@fortawesome/free-solid-svg-icons'
 import { motion, AnimatePresence } from 'framer-motion'
 import Select from 'react-select'
 
@@ -257,6 +257,7 @@ export default function DataTable({
                                       disablePagination = false, title = null, titleIcon = null,
                                   }) {
     const [currentPage, setCurrentPage] = useState(0)
+    const [filtersOpen, setFiltersOpen] = useState(true)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [filters,  setFilters]  = useState({})
     const [searches, setSearches] = useState({})
@@ -308,6 +309,25 @@ export default function DataTable({
 
     const clearAllFilters = () => { setFilters({}); setSearches({}); setCurrentPage(0) }
     const hasActiveFilters = Object.keys(filters).length > 0 || Object.keys(searches).length > 0
+
+    // ── خروجی CSV از همون داده‌های فیلترشده ──
+    const exportCsv = () => {
+        const headers = columns.map(c => `"${c.label}"`).join(',')
+        const rows = filteredData.map(row =>
+            columns.map(c => {
+                const raw = c.exportValue ? c.exportValue(row) : row[c.key]
+                return `"${String(raw ?? '').replace(/"/g, '""')}"`
+            }).join(',')
+        )
+        const csv = '\uFEFF' + [headers, ...rows].join('\n') // BOM برای پشتیبانی فارسی در اکسل
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${title || 'خروجی'}-${new Date().toISOString().slice(0, 10)}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+    }
     const handlePageChange = (page) => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }) }
 
     const renderPageNumbers = () => {
@@ -348,6 +368,27 @@ export default function DataTable({
                 <div className="flex-1" />
                 <ActiveFiltersPopup filters={filters} searches={searches} columns={columns}
                                     onClearOne={clearOneFilter} onClearAll={clearAllFilters} />
+
+                <button onClick={() => setFiltersOpen(v => !v)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold"
+                        style={{
+                            background: filtersOpen ? 'var(--primary-light)' : 'var(--surface)',
+                            color: filtersOpen ? 'var(--primary)' : 'var(--text-soft)',
+                            border: `1.5px solid ${filtersOpen ? 'var(--primary)' : 'var(--border)'}`,
+                        }}>
+                    <FontAwesomeIcon icon={faFilter} className="w-3 h-3" />
+                    فیلتر
+                </button>
+
+                <button onClick={exportCsv}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold"
+                        style={{ background: 'var(--surface)', color: 'var(--text-soft)', border: '1.5px solid var(--border)' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text)' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.color = 'var(--text-soft)' }}>
+                    <FontAwesomeIcon icon={faFileExport} className="w-3 h-3" />
+                    خروجی CSV
+                </button>
+
                 <AnimatePresence>
                     {hasActiveFilters && (
                         <motion.button initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }}
@@ -383,37 +424,39 @@ export default function DataTable({
                 <table className="w-full" style={{ borderCollapse: 'collapse' }}>
                     <thead>
                     {/* ردیف فیلترها */}
-                    <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
-                        {columns.map((col, i) => (
-                            <th key={i} className="px-2 py-2"
-                                style={{ borderLeft: i < columns.length - 1 ? '1px solid var(--border)' : 'none', minWidth: '90px' }}>
-                                {col.filter?.type === 'select' ? (
-                                    /* ⭐ select هم با تیک تایید */
-                                    <SelectInput
-                                        colKey={col.key}
-                                        colLabel={col.label}
-                                        placeholder={col.filter.placeholder}
-                                        options={col.filter.options(data)}
-                                        committedValue={filters[col.key] ?? null}
-                                        onCommit={handleSelectCommit}
-                                    />
-                                ) : col.searchable !== false ? (
-                                    /* ⭐ text با min 2 کاراکتر + تیک */
-                                    <SearchInput
-                                        colKey={col.key}
-                                        colLabel={col.label}
-                                        committedValue={searches[col.key]}
-                                        onCommit={handleSearchCommit}
-                                    />
-                                ) : null}
-                            </th>
-                        ))}
-                    </tr>
+                    {filtersOpen && (
+                        <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
+                            {columns.map((col, i) => (
+                                <th key={i} className="px-2 py-2"
+                                    style={{ borderLeft: i < columns.length - 1 ? '1px solid var(--border)' : 'none', minWidth: '90px' }}>
+                                    {col.filter?.type === 'select' ? (
+                                        /* ⭐ select هم با تیک تایید */
+                                        <SelectInput
+                                            colKey={col.key}
+                                            colLabel={col.label}
+                                            placeholder={col.filter.placeholder}
+                                            options={col.filter.options(data)}
+                                            committedValue={filters[col.key] ?? null}
+                                            onCommit={handleSelectCommit}
+                                        />
+                                    ) : col.searchable !== false ? (
+                                        /* ⭐ text با min 2 کاراکتر + تیک */
+                                        <SearchInput
+                                            colKey={col.key}
+                                            colLabel={col.label}
+                                            committedValue={searches[col.key]}
+                                            onCommit={handleSearchCommit}
+                                        />
+                                    ) : null}
+                                </th>
+                            ))}
+                        </tr>
+                    )}
                     {/* هدر ستون‌ها */}
-                    <tr style={{ background: 'var(--primary)' }}>
+                    <tr style={{ background: 'var(--surface-2)' }}>
                         {columns.map((col, i) => (
                             <th key={i} className="px-4 py-3 text-center text-sm font-bold"
-                                style={{ color: '#fff', borderLeft: i < columns.length - 1 ? '1px solid rgba(255,255,255,0.15)' : 'none', whiteSpace: 'nowrap' }}>
+                                style={{ color: 'var(--text)', borderBottom: '1.5px solid var(--border)', borderLeft: i < columns.length - 1 ? '1px solid var(--border)' : 'none', whiteSpace: 'nowrap' }}>
                                 {col.label}
                             </th>
                         ))}

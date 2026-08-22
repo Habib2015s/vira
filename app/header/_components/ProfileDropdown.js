@@ -27,10 +27,10 @@ export function ProfileDropdown({ isOpen, onToggle, dropdownRef, isDark, onLogou
                               colors={`primary:${isDark ? '#a5b4fc' : '#3730a3'},secondary:${isDark ? '#7c72e0' : '#544ccf'}`}
                               size={32} />
                 </div>
-                {/* ⭐ اسم واقعی */}
-                <div className="hidden sm:flex flex-col leading-none text-right gap-1">
+                {/* ⭐ اسم و نقش در یک سطر */}
+                <div className="hidden sm:flex items-center gap-2 leading-none text-right">
                     <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>{user.name}</span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full self-end"
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                           style={{ background: 'var(--primary-light)', color: 'var(--primary)' }}>
                         {user.role}
                     </span>

@@ -8,7 +8,7 @@ export default function DashboardLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-screen" style={{ background: 'var(--bg)' }}>
             {/* Sidebar */}
             <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} style={{
                 marginRight: isSidebarOpen ? '256px' : '96px'

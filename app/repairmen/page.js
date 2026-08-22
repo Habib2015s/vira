@@ -15,6 +15,10 @@ import { faEye } from '@fortawesome/free-solid-svg-icons'
 const BASE = ENV.API_REPAIRMEN
 
 
+// ⭐⭐ تغییر اصلی: مسیر استخراج داده اصلاح شد.
+// قبلاً `result.data.repairmen` مستقیم گرفته می‌شد که کل آبجکت pagination
+// (شامل data/per_page/next_cursor/...) بود، نه آرایه‌ی واقعی رکوردها.
+// دقیقاً مثل الگوی shops که از `result.data.shops.data` می‌خونه.
 const fetchRepairmen = async ({ pageParam = null }) => {
     let url = BASE
     if (pageParam) url += `?cursor=${pageParam}`
@@ -22,9 +26,10 @@ const fetchRepairmen = async ({ pageParam = null }) => {
     if (!res.ok) throw new Error('خطا در دریافت اطلاعات')
     const result = await res.json()
     return {
-        data: result.data.repairmen,
-        next_cursor: result.data.next_cursor
-    }}
+        data:        result.data?.repairmen?.data || [],
+        next_cursor: result.data?.repairmen?.next_cursor ?? null,
+    }
+}
 
 const CONTRACT_LABELS = { have: 'دارد', completion: 'اتمام', no_need: 'نیاز نیست' }
 const CONTRACT_COLORS = {
@@ -40,6 +45,9 @@ export default function RepairmenPage() {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
         queryKey: ['repairmen'],
         queryFn: fetchRepairmen,
+        // ⭐⭐ اضافه شد: تو نسخه فعلی React Query این فیلد الزامیه، بدونش
+        // ممکنه کوئری اصلاً درست اجرا نشه (مثل فایل storehouseUsers که این رو داشت)
+        initialPageParam: null,
         getNextPageParam: (p) => p.next_cursor ?? undefined,
         staleTime: 5 * 60 * 1000,
     })
@@ -47,7 +55,7 @@ export default function RepairmenPage() {
     const deleteMutation = useMutation({
         mutationFn: (id) => fetch(`${BASE}/${id}`, { method: 'DELETE', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => {
-            queryClient.invalidateQueries(['repairmen'])
+            queryClient.invalidateQueries({ queryKey: ['repairmen'] })
             Swal.fire({ title: 'حذف شد!', text: 'تعمیرکار حذف شد', icon: 'success', timer: 2000, showConfirmButton: false })
         },
         onError: () => Swal.fire('خطا!', 'حذف انجام نشد', 'error')

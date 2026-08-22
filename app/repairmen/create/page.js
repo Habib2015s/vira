@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserCog, faSpinner, faSave, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
@@ -12,9 +12,25 @@ import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE = ENV.API_REPAIRMEN
 
+// ⭐⭐ تغییر اصلی: این کامپوننت از داخل RepairmenCreatePage به اینجا (بیرون از تابع، سطح فایل) منتقل شد.
+// قبلاً چون داخل کامپوننت اصلی تعریف می‌شد، با هر تایپ (هر re-render) از نو ساخته می‌شد
+// و React اون رو یه کامپوننت جدید می‌دید → input قبلی حذف و input جدید ساخته می‌شد → فوکوس از دست می‌رفت.
+// حالا چون بیرونه، همیشه همون reference ثابت رو داره و React فقط props رو آپدیت می‌کنه، نه کل DOM node رو.
+function Field({ label, name, placeholder, type = 'text', value, error, onChange }) {
+    return (
+        <div>
+            <label className="form-label">{label}</label>
+            <input type={type} value={value} onChange={e => onChange(name, e.target.value)}
+                   placeholder={placeholder}
+                   className={`form-input ${error ? 'border-red-400 focus:border-red-500' : ''}`} />
+            {error && <p className="text-xs mt-1" style={{ color: 'var(--danger)' }}>{error}</p>}
+        </div>
+    )
+}
 
 export default function RepairmenCreatePage() {
-    const router = useRouter()
+    const router      = useRouter()
+    const queryClient = useQueryClient()
     const [form, setForm] = useState({
         name: '', family: '', phone: '', national_code: '',
         personal_code: '', workplace: '', contract_status: 'have'
@@ -22,16 +38,30 @@ export default function RepairmenCreatePage() {
     const [errors, setErrors] = useState({})
 
     const mutation = useMutation({
-        mutationFn: (data) => fetch(BASE, { method: 'POST', headers: getHeaders(), body: JSON.stringify(data) }).then(r => r.json()),
+        mutationFn: (data) => fetch(BASE, { method: 'POST', headers: getHeaders(), body: JSON.stringify(data) })
+            .then(async r => {
+                const json = await r.json().catch(() => ({}))
+                return { ...json, __ok: r.ok }
+            }),
         onSuccess: (res) => {
-            if (res.data) {
+            if (res.__ok && res.data) {
+                // ⭐⭐ اضافه شد: بدون این خط، لیست تعمیرکاران رکورد جدید رو نشون نمی‌داد
+                // (مگر با رفرش دستی صفحه). الان به‌محض ثبت، cache لیست باطل میشه و لیست دوباره fetch میشه.
+                queryClient.invalidateQueries({ queryKey: ['repairmen'] })
                 Swal.fire({ title: 'ثبت شد!', text: 'تعمیرکار جدید اضافه شد', icon: 'success', timer: 2000, showConfirmButton: false })
                 router.push('/repairmen')
             } else {
-                setErrors(res.errors ?? {})
+                // ⭐ نرمال‌سازی خطاهای validation (چه رشته باشن چه آرایه)
+                const errMap = {}
+                if (res.errors && typeof res.errors === 'object') {
+                    Object.entries(res.errors).forEach(([k, v]) => { errMap[k] = Array.isArray(v) ? v[0] : v })
+                }
+                setErrors(errMap)
+                const firstMsg = Object.values(errMap)[0] || (typeof res.errors === 'string' ? res.errors : null) || res.message || 'عملیات انجام نشد'
+                Swal.fire({ title: 'خطا', text: firstMsg, icon: 'error' })
             }
         },
-        onError: () => Swal.fire('خطا!', 'عملیات انجام نشد', 'error')
+        onError: () => Swal.fire('خطا!', 'مشکل در اتصال به سرور', 'error')
     })
 
     const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: null })) }
@@ -44,16 +74,6 @@ export default function RepairmenCreatePage() {
         if (Object.keys(err).length) return setErrors(err)
         mutation.mutate(form)
     }
-
-    const Field = ({ label, name, placeholder, type = 'text' }) => (
-        <div>
-            <label className="form-label">{label}</label>
-            <input type={type} value={form[name]} onChange={e => set(name, e.target.value)}
-                placeholder={placeholder}
-                className={`form-input ${errors[name] ? 'border-red-400 focus:border-red-500' : ''}`} />
-            {errors[name] && <p className="text-xs mt-1" style={{ color: 'var(--danger)' }}>{errors[name]}</p>}
-        </div>
-    )
 
     return (
         <DashboardLayout>
@@ -80,12 +100,18 @@ export default function RepairmenCreatePage() {
                     <div className="card">
                         <div className="card-body">
                             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <Field label="نام *" name="name" placeholder="نام تعمیرکار" />
-                                <Field label="نام خانوادگی *" name="family" placeholder="نام خانوادگی" />
-                                <Field label="تلفن" name="phone" placeholder="09xxxxxxxxx" />
-                                <Field label="کد ملی" name="national_code" placeholder="کد ملی" />
-                                <Field label="کد پرسنلی" name="personal_code" placeholder="کد پرسنلی" />
-                                <Field label="محل کار" name="workplace" placeholder="محل کار" />
+                                <Field label="نام *" name="name" placeholder="نام تعمیرکار"
+                                       value={form.name} error={errors.name} onChange={set} />
+                                <Field label="نام خانوادگی *" name="family" placeholder="نام خانوادگی"
+                                       value={form.family} error={errors.family} onChange={set} />
+                                <Field label="تلفن" name="phone" placeholder="09xxxxxxxxx"
+                                       value={form.phone} error={errors.phone} onChange={set} />
+                                <Field label="کد ملی" name="national_code" placeholder="کد ملی"
+                                       value={form.national_code} error={errors.national_code} onChange={set} />
+                                <Field label="کد پرسنلی" name="personal_code" placeholder="کد پرسنلی"
+                                       value={form.personal_code} error={errors.personal_code} onChange={set} />
+                                <Field label="محل کار" name="workplace" placeholder="محل کار"
+                                       value={form.workplace} error={errors.workplace} onChange={set} />
 
                                 <div>
                                     <label className="form-label">وضعیت قرارداد</label>

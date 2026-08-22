@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faUserShield, faTrash, faSpinner, faPlus,
     faWarehouse, faUser, faCalendar,
-    faXmark, faSave, faHashtag
+    faXmark, faSave, faHashtag, faTriangleExclamation
 } from '@fortawesome/free-solid-svg-icons'
 import Select from 'react-select'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
@@ -40,7 +40,7 @@ const makeSelectStyles = (isDark) => ({
         background:  isDark ? 'var(--surface)' : 'var(--surface)',
         borderColor: s.isFocused ? 'var(--primary)' : 'var(--border)',
         borderWidth: '1.5px', borderRadius: 'var(--radius)',
-        boxShadow:   s.isFocused ? '0 0 0 3px rgba(84,76,207,0.15)' : 'none',
+        boxShadow:   s.isFocused ? '0 0 0 3px rgba(24,24,27,0.15)' : 'none',
         '&:hover':   { borderColor: 'var(--border-strong)' },
     }),
     menu:        (b) => ({ ...b, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-lg)' }),
@@ -70,8 +70,21 @@ const fetchStorehouseUsers = async ({ pageParam = null }) => {
     return (await res.json()).data.storehouseUsers
 }
 
+// ⭐⭐ اضافه شد: تابع جدا با error handling درست برای گرفتن لیست انبارها.
+// قبلاً اگه بک‌اند خطا می‌داد (مثلاً 500)، کد بی‌سروصدا [] برمی‌گردوند
+// و هیچ نشونه‌ای از خطا نبود - انگار اصلاً درخواستی رد نشده.
+const fetchStorehouses = async () => {
+    const res = await fetch(ENV.API_WAREHOUSE_STOREHOUSES, { headers: getHeaders() })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) {
+        // ⭐ خطای واقعی بک‌اند رو پرتاب می‌کنیم تا useQuery اون رو به‌عنوان error بشناسه
+        throw new Error(json?.message || json?.errors || `خطای سرور (${res.status}) در دریافت لیست انبارها`)
+    }
+    return json.data?.storehouses?.data || []
+}
+
 // ── Modal افزودن دسترسی ─────────────────────────────
-function AddModal({ open, onClose, onSuccess, storehouses, existingUserIds }) {
+function AddModal({ open, onClose, onSuccess, storehouses, existingUserIds, storehousesError }) {
     const isDark    = useIsDark()
     const styles    = makeSelectStyles(isDark)
     const [userOpt,      setUserOpt]      = useState(null)
@@ -161,12 +174,27 @@ function AddModal({ open, onClose, onSuccess, storehouses, existingUserIds }) {
                         </div>
                         <p className="card-title">افزودن دسترسی به انبار</p>
                     </div>
-                    <button onClick={onClose} className="action-btn action-btn-delete w-7 h-7">
+                    <button onClick={onClose} className="icon-action danger w-7 h-7">
                         <FontAwesomeIcon icon={faXmark} className="w-3.5 h-3.5" />
                     </button>
                 </div>
 
                 <div className="card-body">
+                    {/* ⭐⭐ اضافه شد: اگه گرفتن لیست انبارها خطا داشت، به‌جای خالی بودن ساکت دراپ‌داون، اینجا واضح نشون بده */}
+                    {storehousesError && (
+                        <div className="mb-4 p-3 rounded-xl flex items-start gap-2.5 text-xs"
+                             style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)', color: 'var(--danger)' }}>
+                            <FontAwesomeIcon icon={faTriangleExclamation} className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                            <div>
+                                <p className="font-bold mb-1">دریافت لیست انبارها با خطا مواجه شد</p>
+                                <p>{storehousesError}</p>
+                                <p className="mt-1" style={{ color: 'var(--text-muted)' }}>
+                                    این یعنی درخواست به سرور رفته ولی سرور خطا برگردونده (نه اینکه درخواستی نرفته). احتمالاً هنوز انباری در دیتابیس ثبت نشده یا endpoint بک‌اند مشکل داره.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-4">
 
                         {/* ── انتخاب کاربر ── */}
@@ -185,7 +213,6 @@ function AddModal({ open, onClose, onSuccess, storehouses, existingUserIds }) {
                                 onChange={handleUserChange}
                                 styles={{
                                     ...styles,
-                                    // ⭐ استایل خاص گزینه "وارد کردن شناسه جدید"
                                     option: (b, s) => ({
                                         ...styles.option(b, s),
                                         ...(s.data?.isNew ? {
@@ -208,8 +235,9 @@ function AddModal({ open, onClose, onSuccess, storehouses, existingUserIds }) {
                                         <div className="flex items-center gap-2">
                                             <div className="w-6 h-6 rounded-lg flex items-center justify-center"
                                                  style={{
-                                                     background: `hsl(${(opt.value * 61) % 360}, 65%, 88%)`,
-                                                     color:      `hsl(${(opt.value * 61) % 360}, 55%, 38%)`,
+                                                     background: 'var(--surface-2)',
+                                                     color:      'var(--text-soft)',
+                                                     border: '1px solid var(--border)',
                                                  }}>
                                                 <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                                             </div>
@@ -265,8 +293,9 @@ function AddModal({ open, onClose, onSuccess, storehouses, existingUserIds }) {
                                 value={storehouse}
                                 onChange={(opt) => { setStorehouse(opt); setErrors(p => ({ ...p, storehouse_id: null })) }}
                                 styles={styles}
-                                placeholder="جستجو یا انتخاب انبار..."
+                                placeholder={storehouses.length === 0 ? 'انباری موجود نیست' : 'جستجو یا انتخاب انبار...'}
                                 isClearable
+                                isDisabled={storehouses.length === 0}
                                 noOptionsMessage={() => 'انباری یافت نشد'}
                                 menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                                 menuPosition="fixed"
@@ -280,8 +309,9 @@ function AddModal({ open, onClose, onSuccess, storehouses, existingUserIds }) {
                                     <div className="flex items-center gap-2">
                                         <div className="w-6 h-6 rounded-lg flex items-center justify-center"
                                              style={{
-                                                 background: `hsl(${(opt.value * 47) % 360}, 65%, 88%)`,
-                                                 color:      `hsl(${(opt.value * 47) % 360}, 55%, 38%)`,
+                                                 background: 'var(--surface-2)',
+                                                 color:      'var(--text-soft)',
+                                                 border: '1px solid var(--border)',
                                              }}>
                                             <FontAwesomeIcon icon={faWarehouse} className="w-3 h-3" />
                                         </div>
@@ -356,19 +386,16 @@ export default function StorehouseUsersPage() {
     const styles         = makeSelectStyles(isDark)
     const [modalOpen, setModalOpen] = useState(false)
 
-    const { data: shData } = useQuery({
+    // ⭐⭐ تغییر اصلی: از fetchStorehouses جدید استفاده می‌کنیم که خطای واقعی رو throw می‌کنه
+    const { data: storehouses = [], error: storehousesQueryError } = useQuery({
         queryKey: ['warehouseStorehouses'],
-        queryFn: () => fetch(ENV.API_WAREHOUSE_STOREHOUSES, { headers: getHeaders() })
-            .then(r => r.json()).then(r => r.data?.storehouses?.data || []),
+        queryFn: fetchStorehouses,
         staleTime: 10 * 60 * 1000,
+        retry: 1,
     })
-    const storehouses =
-        Array.isArray(shData)
-            ? shData
-            : shData?.data?.storehouses?.data
-            ?? shData?.data?.storehouses
-            ?? []
-    const storeMap    = Object.fromEntries(storehouses.map(s => [s.id, s]))
+    const storehousesError = storehousesQueryError?.message || null
+
+    const storeMap = Object.fromEntries(storehouses.map(s => [s.id, s]))
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
         queryKey: ['storehouseUsers'],
@@ -458,7 +485,7 @@ export default function StorehouseUsersPage() {
         {
             key: 'actions', label: 'عملیات',
             render: (row) => (
-                <button className="action-btn action-btn-delete" title="حذف دسترسی"
+                <button className="icon-action danger" title="حذف دسترسی"
                         onClick={() => handleDelete(row)} disabled={deleteMutation.isPending}>
                     <FontAwesomeIcon icon={deleteMutation.isPending ? faSpinner : faTrash}
                                      className={`w-3.5 h-3.5 ${deleteMutation.isPending ? 'animate-spin' : ''}`} />
@@ -493,6 +520,16 @@ export default function StorehouseUsersPage() {
                 </div>
 
                 <div className="page-content max-w-7xl">
+
+                    {/* ⭐⭐ اضافه شد: بنر هشدار در خود صفحه هم (نه فقط داخل مودال) اگه انبارها لود نشدن */}
+                    {storehousesError && (
+                        <div className="mb-4 p-3 rounded-xl flex items-center gap-2.5 text-sm"
+                             style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)', color: 'var(--danger)' }}>
+                            <FontAwesomeIcon icon={faTriangleExclamation} className="w-4 h-4 flex-shrink-0" />
+                            <span><strong>خطا در دریافت لیست انبارها:</strong> {storehousesError}</span>
+                        </div>
+                    )}
+
                     <div className="grid grid-cols-3 gap-4 mb-5">
                         {[
                             { label: 'کل دسترسی‌ها',  value: allData.length,          icon: faUserShield, color: 'var(--primary)', bg: 'var(--primary-light)' },
@@ -533,6 +570,7 @@ export default function StorehouseUsersPage() {
                             onSuccess={() => queryClient.invalidateQueries({ queryKey: ['storehouseUsers'] })}
                             storehouses={storehouses}
                             existingUserIds={existingUserIds}
+                            storehousesError={storehousesError}
                         />
                     )}
                 </AnimatePresence>

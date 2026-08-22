@@ -16,7 +16,7 @@ export default function CreateTmCodePage() {
     const queryClient = useQueryClient()
     const router      = useRouter()
     const [shops,      setShops]      = useState([])
-    const [pmGroups,   setPmGroups]   = useState([])   // ⭐ لیست گروه‌های PM
+    const [pmGroups,   setPmGroups]   = useState([])
     const [loading,    setLoading]    = useState(false)
     const [errors,     setErrors]     = useState({})
 
@@ -27,7 +27,6 @@ export default function CreateTmCodePage() {
     })
 
     useEffect(() => {
-        // fetch شاپ‌ها و گروه‌های PM همزمان
         Promise.all([
             fetch(ENV.API_SHOPS,    { headers: getHeaders() }).then(r => r.json()),
             fetch(ENV.API_SHOPS.replace('/shops', '/pmGroups'), { headers: getHeaders() }).then(r => r.json()),
@@ -45,11 +44,14 @@ export default function CreateTmCodePage() {
 
     const normalizeInt = (val) => (val ? parseInt(val) : 0)
 
+    // ⭐⭐ تغییر اصلی: mechanism_group_id به لیست الزامی‌ها اضافه شد
+    // چون بک‌اند اونو required می‌خواد (طبق پاسخ 422 که برگردوند)
     const validateForm = () => {
         const newErrors = {}
-        if (!formData.code.trim())  newErrors.code    = 'کد الزامی است'
-        if (!formData.title.trim()) newErrors.title   = 'عنوان الزامی است'
-        if (!formData.shop_id)      newErrors.shop_id = 'انتخاب شاپ الزامی است'
+        if (!formData.code.trim())      newErrors.code                = 'کد الزامی است'
+        if (!formData.title.trim())     newErrors.title               = 'عنوان الزامی است'
+        if (!formData.shop_id)          newErrors.shop_id             = 'انتخاب شاپ الزامی است'
+        if (!formData.mechanism_group_id) newErrors.mechanism_group_id = 'انتخاب گروه مکانیزم الزامی است'
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
@@ -73,7 +75,8 @@ export default function CreateTmCodePage() {
                     amount_per_hours:   normalizeInt(formData.amount_per_hours),
                     max_cost:           normalizeInt(formData.max_cost),
                     base_amount:        normalizeInt(formData.base_amount),
-                    mechanism_group_id: formData.mechanism_group_id ? parseInt(formData.mechanism_group_id) : undefined,
+                    // ⭐ دیگه undefined نمیشه چون validate قبلش جلوش رو می‌گیره
+                    mechanism_group_id: parseInt(formData.mechanism_group_id),
                     is_active:          formData.is_active,
                 })
             })
@@ -83,7 +86,22 @@ export default function CreateTmCodePage() {
                 router.push('/requests/list')
             } else {
                 const err = await res.json()
-                Swal.fire({ title: 'خطا', text: err?.message?.[0] || 'مشکلی رخ داد', icon: 'error' })
+                // ⭐ خواندن درست پیام خطای validation لاراول (errors.field[0])، نه فقط message
+                let msg = 'مشکلی رخ داد'
+                if (err?.errors && typeof err.errors === 'object') {
+                    const firstKey = Object.keys(err.errors)[0]
+                    msg = err.errors[firstKey]?.[0] || err.message || msg
+                } else if (typeof err?.message === 'string') {
+                    msg = err.message
+                }
+                Swal.fire({ title: 'خطا', text: msg, icon: 'error' })
+
+                // ⭐ اگه خطای validation مربوط به فیلد خاصی بود، زیر همون فیلد هم نشون بده
+                if (err?.errors && typeof err.errors === 'object') {
+                    const fieldErrors = {}
+                    Object.entries(err.errors).forEach(([k, v]) => { fieldErrors[k] = Array.isArray(v) ? v[0] : v })
+                    setErrors(prev => ({ ...prev, ...fieldErrors }))
+                }
             }
         } catch {
             Swal.fire({ title: 'خطا', text: 'مشکل در اتصال', icon: 'error' })
@@ -99,7 +117,7 @@ export default function CreateTmCodePage() {
     ) : null
 
     const selectStyles = {
-        control: (b, s) => ({ ...b, minHeight: '48px', borderRadius: '8px', background: 'var(--surface)', borderColor: s.isFocused ? 'var(--primary)' : 'var(--border)', borderWidth: '2px', boxShadow: s.isFocused ? '0 0 0 3px rgba(84,76,207,0.15)' : 'none', '&:hover': { borderColor: 'var(--border-strong)' } }),
+        control: (b, s) => ({ ...b, minHeight: '48px', borderRadius: '8px', background: 'var(--surface)', borderColor: s.isFocused ? 'var(--primary)' : 'var(--border)', borderWidth: '2px', boxShadow: s.isFocused ? '0 0 0 3px rgba(24,24,27,0.15)' : 'none', '&:hover': { borderColor: 'var(--border-strong)' } }),
         menu:        (b) => ({ ...b, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', zIndex: 9999 }),
         menuList:    (b) => ({ ...b, padding: '6px', background: 'var(--surface)' }),
         option:      (b, s) => ({ ...b, borderRadius: '6px', background: s.isSelected ? 'var(--primary)' : s.isFocused ? 'var(--surface-2)' : 'transparent', color: s.isSelected ? '#fff' : 'var(--text)' }),
@@ -110,7 +128,6 @@ export default function CreateTmCodePage() {
     }
 
     const shopOptions    = shops.map(s => ({ value: s.id, label: `${s.name} (${s.code})` }))
-    // ⭐ گزینه‌های گروه مکانیزم از API
     const pmGroupOptions = pmGroups.map(g => ({
         value: g.id,
         label: `${g.mechanism_group_code || g.id}${g.description ? ` — ${g.description}` : ''}`,
@@ -121,7 +138,7 @@ export default function CreateTmCodePage() {
         fontWeight: 500, outline: 'none', background: 'var(--surface)', color: 'var(--text)',
         border: `2px solid ${hasError ? 'var(--danger)' : 'var(--border)'}`, transition: 'border-color 0.15s',
     })
-    const onFocus = (e, err) => { e.target.style.borderColor = err ? 'var(--danger)' : 'var(--primary)'; e.target.style.boxShadow = `0 0 0 3px ${err ? 'rgba(220,38,38,0.12)' : 'rgba(84,76,207,0.15)'}` }
+    const onFocus = (e, err) => { e.target.style.borderColor = err ? 'var(--danger)' : 'var(--primary)'; e.target.style.boxShadow = `0 0 0 3px ${err ? 'rgba(220,38,38,0.12)' : 'rgba(24,24,27,0.15)'}` }
     const onBlur  = (e, err) => { e.target.style.borderColor = err ? 'var(--danger)' : 'var(--border)'; e.target.style.boxShadow = 'none' }
     const L = ({ text, required }) => (
         <label className="form-label">
@@ -150,7 +167,6 @@ export default function CreateTmCodePage() {
                             <form onSubmit={handleSubmit}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                                    {/* کد */}
                                     <div>
                                         <L text="کد" required />
                                         <input type="text" name="code" value={formData.code} onChange={handleChange}
@@ -159,7 +175,6 @@ export default function CreateTmCodePage() {
                                         <ErrorMsg error={errors.code} />
                                     </div>
 
-                                    {/* عنوان */}
                                     <div>
                                         <L text="عنوان" required />
                                         <input type="text" name="title" value={formData.title} onChange={handleChange}
@@ -168,7 +183,6 @@ export default function CreateTmCodePage() {
                                         <ErrorMsg error={errors.title} />
                                     </div>
 
-                                    {/* شاپ */}
                                     <div>
                                         <L text="شاپ" required />
                                         <Select options={shopOptions}
@@ -184,7 +198,6 @@ export default function CreateTmCodePage() {
                                         <ErrorMsg error={errors.shop_id} />
                                     </div>
 
-                                    {/* نوع */}
                                     <div>
                                         <L text="نوع" />
                                         <select name="type" value={formData.type} onChange={handleChange}
@@ -195,7 +208,6 @@ export default function CreateTmCodePage() {
                                         </select>
                                     </div>
 
-                                    {/* ساعت */}
                                     <div>
                                         <L text="ساعت" />
                                         <input type="number" name="hours" value={formData.hours} onChange={handleChange} min="0"
@@ -203,7 +215,6 @@ export default function CreateTmCodePage() {
                                                onFocus={e => onFocus(e, false)} onBlur={e => onBlur(e, false)} />
                                     </div>
 
-                                    {/* مبلغ بر ساعت */}
                                     <div>
                                         <L text="مبلغ بر ساعت (ریال)" />
                                         <input type="number" name="amount_per_hours" value={formData.amount_per_hours} onChange={handleChange} min="0"
@@ -211,7 +222,6 @@ export default function CreateTmCodePage() {
                                                onFocus={e => onFocus(e, false)} onBlur={e => onBlur(e, false)} />
                                     </div>
 
-                                    {/* حداکثر هزینه */}
                                     <div>
                                         <L text="حداکثر هزینه (ریال)" />
                                         <input type="number" name="max_cost" value={formData.max_cost} onChange={handleChange} min="0"
@@ -219,7 +229,6 @@ export default function CreateTmCodePage() {
                                                onFocus={e => onFocus(e, false)} onBlur={e => onBlur(e, false)} />
                                     </div>
 
-                                    {/* هزینه پایه */}
                                     <div>
                                         <L text="هزینه پایه (ریال)" />
                                         <input type="number" name="base_amount" value={formData.base_amount} onChange={handleChange} min="0"
@@ -227,24 +236,23 @@ export default function CreateTmCodePage() {
                                                onFocus={e => onFocus(e, false)} onBlur={e => onBlur(e, false)} />
                                     </div>
 
-                                    {/* ⭐ گروه مکانیزم — Select2 از API */}
+                                    {/* ⭐ گروه مکانیزم — الان required، دیگه "اختیاری" نیست */}
                                     <div>
-                                        <L text="گروه مکانیزم" />
+                                        <L text="گروه مکانیزم" required />
                                         <Select
                                             options={pmGroupOptions}
                                             value={pmGroupOptions.find(o => o.value === formData.mechanism_group_id) || null}
-                                            onChange={opt => setFormData(p => ({ ...p, mechanism_group_id: opt?.value || null }))}
+                                            onChange={opt => { setFormData(p => ({ ...p, mechanism_group_id: opt?.value || null })); setErrors(p => ({ ...p, mechanism_group_id: '' })) }}
                                             placeholder={pmGroups.length === 0 ? 'در حال بارگذاری...' : 'انتخاب گروه مکانیزم...'}
                                             isClearable isSearchable
                                             noOptionsMessage={() => 'گروهی یافت نشد'}
-                                            styles={selectStyles}
+                                            styles={{ ...selectStyles, control: (b, s) => ({ ...selectStyles.control(b, s), borderColor: errors.mechanism_group_id ? 'var(--danger)' : s.isFocused ? 'var(--primary)' : 'var(--border)' }) }}
                                             menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                                             menuPosition="fixed"
                                         />
-                                        <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>اختیاری</p>
+                                        <ErrorMsg error={errors.mechanism_group_id} />
                                     </div>
 
-                                    {/* وضعیت */}
                                     <div>
                                         <L text="وضعیت" />
                                         <select name="is_active" value={formData.is_active} onChange={handleChange}
@@ -255,7 +263,6 @@ export default function CreateTmCodePage() {
                                     </div>
                                 </div>
 
-                                {/* راهنما */}
                                 <div className="mt-5 p-3 rounded-xl text-sm"
                                      style={{ background: 'var(--info-light)', border: '1px solid var(--info)33' }}>
                                     <span style={{ color: 'var(--info)' }}>
