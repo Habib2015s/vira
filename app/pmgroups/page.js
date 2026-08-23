@@ -3,15 +3,14 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faTrash, faSpinner, faPlus, faLayerGroup } from '@fortawesome/free-solid-svg-icons'
+import { faPen, faTrash, faSpinner, faPlus, faLayerGroup, faEye } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
-import { faEye } from '@fortawesome/free-solid-svg-icons'
-
 
 const BASE = ENV.API_PM_GROUPS
 
@@ -90,8 +89,6 @@ export default function PmGroupsPage() {
             key: 'actions', label: 'عملیات',
             render: (row) => (
                 <div className="flex items-center justify-center gap-2">
-
-                    {/* 👁 Show */}
                     <Link href={`/pmgroups/show/${row.id}`}>
                         <button
                             className="w-9 h-9 flex items-center justify-center rounded-lg"
@@ -101,8 +98,6 @@ export default function PmGroupsPage() {
                             <FontAwesomeIcon icon={faEye} className="w-4 h-4" />
                         </button>
                     </Link>
-
-                    {/* ✏️ Edit */}
                     <Link href={`/pmgroups/edit/${row.id}`}>
                         <button
                             className="w-9 h-9 flex items-center justify-center rounded-lg"
@@ -112,8 +107,6 @@ export default function PmGroupsPage() {
                             <FontAwesomeIcon icon={faPen} className="w-4 h-4" />
                         </button>
                     </Link>
-
-                    {/* 🗑 Delete */}
                     <button
                         onClick={() => handleDelete(row)}
                         disabled={deleteMutation.isPending}
@@ -126,7 +119,6 @@ export default function PmGroupsPage() {
                             className={`w-4 h-4 ${deleteMutation.isPending ? 'animate-spin' : ''}`}
                         />
                     </button>
-
                 </div>
             )
         }
@@ -135,27 +127,30 @@ export default function PmGroupsPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-black text-white mb-0.5 flex items-center gap-3">
-                                <FontAwesomeIcon icon={faLayerGroup} className="w-6 h-6 opacity-90" />
-                                گروه‌های PM
-                            </h1>
-                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>مدیریت گروه‌های نگهداری پیشگیرانه ({allData.length} مورد)</p>
-                        </div>
+                <div className="page-content">
+
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faLayerGroup}
+                            root="عملیات تعمیرگاه"
+                            current="گروه‌های PM"
+                        />
                         <Link href="/pmgroups/create">
-                            <button className="btn btn-success">
+                            <button className="btn btn-primary">
                                 <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                 افزودن گروه
                             </button>
                         </Link>
                     </div>
-                </div>
-                <div className="p-6 max-w-7xl mx-auto">
+
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                        <DataTable data={allData} columns={columns} loading={isLoading && allData.length === 0}
-                                   emptyMessage="هیچ گروه PM یافت نشد" disablePagination={true} />
+                        <DataTable
+                            data={allData}
+                            columns={columns}
+                            loading={isLoading && allData.length === 0}
+                            emptyMessage="هیچ گروه PM یافت نشد"
+                            disablePagination={true}
+                        />
                         {hasNextPage && (
                             <div ref={observerTarget} className="py-8 flex justify-center">
                                 <FontAwesomeIcon icon={faSpinner} className="w-5 h-5 animate-spin" style={{ color: 'var(--primary)' }} />

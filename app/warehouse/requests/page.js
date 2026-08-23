@@ -1,6 +1,6 @@
 'use client'
 
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen, faSpinner, faClipboardCheck } from '@fortawesome/free-solid-svg-icons'
@@ -8,8 +8,8 @@ import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
-
 
 const BASE = ENV.API_WAREHOUSE_REQUESTS
 
@@ -81,18 +81,14 @@ export default function WarehouseRequestsPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-black text-white mb-0.5 flex items-center gap-3">
-                                <FontAwesomeIcon icon={faClipboardCheck} className="w-6 h-6 opacity-90" />
-                                درخواست‌های انبار
-                            </h1>
-                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>مدیریت درخواست‌های ورود/خروج کالا ({allData.length} مورد)</p>
-                        </div>
+                <div className="page-content">
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faClipboardCheck}
+                            root="انبار"
+                            current="درخواست‌های انبار"
+                        />
                     </div>
-                </div>
-                <div className="p-6 max-w-7xl mx-auto">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
                         <DataTable data={allData} columns={columns} loading={isLoading && allData.length === 0}
                                    emptyMessage="هیچ درخواستی یافت نشد" disablePagination={true} />

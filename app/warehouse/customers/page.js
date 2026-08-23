@@ -9,9 +9,10 @@ import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
 
-const BASE    = ENV.API_WAREHOUSE_CUSTOMERS
+const BASE = ENV.API_WAREHOUSE_CUSTOMERS
 
 const fetchCustomers = async ({ pageParam = null }) => {
     let url = BASE
@@ -62,7 +63,6 @@ export default function CustomersPage() {
 
     const allData = data?.pages.flatMap(p => p.data) ?? []
 
-    // آمار
     const persons   = allData.filter(c => c.type === 'person').length
     const companies = allData.filter(c => c.type === 'company').length
 
@@ -163,55 +163,50 @@ export default function CustomersPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
+                <div className="page-content">
 
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                                 style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                <FontAwesomeIcon icon={faUsers} className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">مشتریان</h1>
-                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                                    {allData.length} مشتری — {persons} حقیقی / {companies} حقوقی
-                                </p>
-                            </div>
-                        </div>
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faUsers}
+                            root="انبار"
+                            current="مشتریان"
+                        />
                         <Link href="/warehouse/customers/create">
-                            <button className="btn btn-success">
+                            <button className="btn btn-primary">
                                 <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                 مشتری جدید
                             </button>
                         </Link>
                     </div>
-                </div>
 
-                {/* آمار */}
-                <div className="max-w-7xl mx-auto px-8 pt-5 grid grid-cols-3 gap-4">
-                    {[
-                        { label: 'کل مشتریان',   value: allData.length, icon: faUsers,    color: 'var(--primary)', bg: 'var(--primary-light)' },
-                        { label: 'اشخاص حقیقی',  value: persons,        icon: faUser,     color: 'var(--success)', bg: 'var(--success-light)' },
-                        { label: 'اشخاص حقوقی',  value: companies,      icon: faBuilding, color: 'var(--info)',    bg: 'var(--info-light)'    },
-                    ].map(({ label, value, icon, color, bg }) => (
-                        <motion.div key={label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                                    className="card p-4 flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: bg }}>
-                                <FontAwesomeIcon icon={icon} className="w-4 h-4" style={{ color }} />
-                            </div>
-                            <div>
-                                <p className="text-xl font-black" style={{ color }}>{value}</p>
-                                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</p>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                    {/* آمار */}
+                    <div className="grid grid-cols-3 gap-4 mb-5">
+                        {[
+                            { label: 'کل مشتریان',   value: allData.length, icon: faUsers,    color: 'var(--primary)', bg: 'var(--primary-light)' },
+                            { label: 'اشخاص حقیقی',  value: persons,        icon: faUser,     color: 'var(--success)', bg: 'var(--success-light)' },
+                            { label: 'اشخاص حقوقی',  value: companies,      icon: faBuilding, color: 'var(--info)',    bg: 'var(--info-light)'    },
+                        ].map(({ label, value, icon, color, bg }) => (
+                            <motion.div key={label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                                        className="card p-4 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: bg }}>
+                                    <FontAwesomeIcon icon={icon} className="w-4 h-4" style={{ color }} />
+                                </div>
+                                <div>
+                                    <p className="text-xl font-black" style={{ color }}>{value}</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
 
-                <div className="page-content max-w-7xl">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                        <DataTable data={allData} columns={columns}
-                                   loading={isLoading && allData.length === 0}
-                                   emptyMessage="هیچ مشتری‌ای یافت نشد" disablePagination={true} />
+                        <DataTable
+                            data={allData}
+                            columns={columns}
+                            loading={isLoading && allData.length === 0}
+                            emptyMessage="هیچ مشتری‌ای یافت نشد"
+                            disablePagination={true}
+                        />
                         {hasNextPage && (
                             <div ref={observerTarget} className="py-8 flex items-center justify-center gap-3">
                                 <FontAwesomeIcon icon={faSpinner} className="w-5 h-5 animate-spin" style={{ color: 'var(--primary)' }} />

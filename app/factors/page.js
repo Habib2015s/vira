@@ -6,6 +6,7 @@ import { faFileInvoiceDollar, faPlus, faSpinner } from '@fortawesome/free-solid-
 import Link from 'next/link'
 import DashboardLayout from '@/app/dashboard/Dashboardlayout'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { useFactors } from './_hooks/useFactors'
 import { getFactorsColumns } from './_components/FactorsColumns'
 import { FactorsStats } from './_components/FactorsStats'
@@ -21,36 +22,25 @@ export default function FactorsPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
+                <div className="page-content">
 
-                {/* هدر */}
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                 style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                <FontAwesomeIcon icon={faFileInvoiceDollar} className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">فاکتورهای انبار</h1>
-                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                                    {allData.length} فاکتور
-                                </p>
-                            </div>
-                        </div>
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faFileInvoiceDollar}
+                            root="انبار"
+                            current="فاکتورهای انبار"
+                        />
                         <Link href="/warehouse/factors/create">
-                            <button className="btn btn-success">
+                            <button className="btn btn-primary">
                                 <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                 فاکتور جدید
                             </button>
                         </Link>
                     </div>
-                </div>
 
-                {/* آمار */}
-                <FactorsStats data={allData} />
+                    {/* آمار */}
+                    <FactorsStats data={allData} />
 
-                {/* جدول */}
-                <div className="page-content max-w-7xl">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
                         <DataTable
                             data={allData}
@@ -70,7 +60,6 @@ export default function FactorsPage() {
                         )}
                     </motion.div>
                 </div>
-
             </div>
         </DashboardLayout>
     )

@@ -9,6 +9,7 @@ import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
 
 
@@ -24,7 +25,6 @@ export default function ProductsListPage() {
     const observerTarget = useRef(null)
     const queryClient    = useQueryClient()
 
-    // ⭐ fetch storehouses و units برای نمایش نام (چون API فقط ID برمیگردونه)
     const { data: shData } = useQuery({
         queryKey: ['warehouseStorehouses'],
         queryFn: () => fetch(ENV.API_WAREHOUSE_STOREHOUSES, { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.storehouses?.data || []),
@@ -168,33 +168,30 @@ export default function ProductsListPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                                 style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                <FontAwesomeIcon icon={faBox} className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">محصولات انبار</h1>
-                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                                    مدیریت محصولات ({allData.length} مورد)
-                                </p>
-                            </div>
-                        </div>
+                <div className="page-content">
+
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faBox}
+                            root="انبار"
+                            current="محصولات انبار"
+                        />
                         <Link href="/warehouse/products/create">
-                            <button className="btn btn-success">
+                            <button className="btn btn-primary">
                                 <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                 محصول جدید
                             </button>
                         </Link>
                     </div>
-                </div>
-                <div className="page-content max-w-7xl">
+
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                        <DataTable data={allData} columns={columns}
-                                   loading={isLoading && allData.length === 0}
-                                   emptyMessage="هیچ محصولی یافت نشد" disablePagination={true} />
+                        <DataTable
+                            data={allData}
+                            columns={columns}
+                            loading={isLoading && allData.length === 0}
+                            emptyMessage="هیچ محصولی یافت نشد"
+                            disablePagination={true}
+                        />
                         {hasNextPage && (
                             <div ref={observerTarget} className="py-8 flex items-center justify-center gap-3">
                                 <FontAwesomeIcon icon={faSpinner} className="w-5 h-5 animate-spin" style={{ color: 'var(--primary)' }} />

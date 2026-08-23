@@ -6,11 +6,12 @@ import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faPlus, faEdit, faEye, faFileLines,
-    faSpinner, faTrash
+    faTrash
 } from '@fortawesome/free-solid-svg-icons'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import WaybillTypeModal from "@/app/modals/Waybilltypemodal"
 import DataTable from "@/app/components/DataTable/DataTable"
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 
 // داده موک — بعداً از API میاد
 const MOCK_WAYBILLS = [
@@ -106,38 +107,25 @@ export default function WaybillsPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
+                <div className="page-content">
 
-                {/* ── هدر ── */}
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                 style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                <FontAwesomeIcon icon={faFileLines} className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">مدیریت بارنامه‌ها</h1>
-                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                                    لیست و مدیریت بارنامه‌ها
-                                </p>
-                            </div>
-                        </div>
-                        <button onClick={() => setModalOpen(true)} className="btn btn-success">
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faFileLines}
+                            root="حمل و نقل"
+                            current="لیست بارنامه‌ها"
+                        />
+                        <button onClick={() => setModalOpen(true)} className="btn btn-primary">
                             <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                             افزودن بارنامه
                         </button>
                     </div>
-                </div>
 
-                {/* ── محتوا ── */}
-                <div className="page-content max-w-7xl">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
                         <DataTable
                             data={waybills}
                             columns={columns}
                             emptyMessage="بارنامه‌ای یافت نشد"
-                            title="لیست بارنامه‌ها"
-                            titleIcon={faFileLines}
                         />
                     </motion.div>
                 </div>

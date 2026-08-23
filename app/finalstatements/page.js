@@ -9,11 +9,11 @@ import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 import DataTable from '@/app/components/DataTable/DataTable'
-import { ENV, getHeaders } from '@/app/config/env'   // ⭐ import اضافه شد
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
+import { ENV, getHeaders } from '@/app/config/env'
 
 // ── API calls ────────────────────────────────────────────
 const fetchFinalStatements = async ({ pageParam = null }) => {
-    // ⭐ حذف ?with=creator — API این پارامتر رو نداره
     let url = ENV.API_FINAL_STATEMENTS
     if (pageParam) url += `?cursor=${pageParam}`
     const res = await fetch(url, { headers: getHeaders() })
@@ -157,41 +157,30 @@ export default function FinalStatementsListPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
+                <div className="page-content">
 
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                 style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                <FontAwesomeIcon icon={faFileInvoice} className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">صورت وضعیت‌ها</h1>
-                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                                    {allStatements.length > 0 ? `${allStatements.length} مورد` : 'مدیریت صورت وضعیت‌های نهایی'}
-                                </p>
-                            </div>
-                        </div>
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faFileInvoice}
+                            root="مالی"
+                            current="صورت وضعیت‌ها"
+                        />
                         <Link href="/finalstatements/create">
-                            <button className="btn btn-success">
+                            <button className="btn btn-primary">
                                 <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                 صورت وضعیت جدید
                             </button>
                         </Link>
                     </div>
-                </div>
 
-                <div className="p-6 max-w-7xl mx-auto">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
                         <DataTable
                             data={allStatements}
                             columns={columns}
                             loading={isLoading}
                             emptyMessage="هیچ صورت وضعیتی یافت نشد"
-                            title="لیست صورت وضعیت‌ها"
                         />
 
-                        {/* infinite scroll trigger */}
                         {hasNextPage && (
                             <div ref={observerTarget} className="py-8 flex justify-center">
                                 <FontAwesomeIcon icon={faSpinner} className="w-5 h-5 animate-spin" style={{ color: 'var(--primary)' }} />

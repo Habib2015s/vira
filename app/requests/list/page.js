@@ -3,12 +3,14 @@
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faSpinner, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faPen, faSpinner, faPlus, faWrench } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
+
 const fetchTmCodes = async ({ pageParam = null, queryKey }) => {
     const [_key, filters] = queryKey
     let url = ENV.API_TM_CODES
@@ -135,16 +137,13 @@ export default function RequestsListPage() {
             key: 'actions',
             label: 'عملیات',
             render: (row) => (
-                <div className="flex justify-center items-center"> {/* ← اضافه شد */}
+                <div className="flex justify-center items-center">
                     <Link href={`/requests/edit/${row.id}`}>
                         <button
-                            className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
-                            style={{ color: 'var(--info)', background: 'var(--info-light)' }}
-                            onMouseEnter={e => e.currentTarget.style.filter = 'brightness(0.9)'}
-                            onMouseLeave={e => e.currentTarget.style.filter = 'none'}
+                            className="icon-action"
                             title="ویرایش"
                         >
-                            <FontAwesomeIcon icon={faPen} className="w-4 h-4" />
+                            <FontAwesomeIcon icon={faPen} className="w-3.5 h-3.5" />
                         </button>
                     </Link>
                 </div>
@@ -155,37 +154,31 @@ export default function RequestsListPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
+                <div className="page-content">
 
-                {/* Page Header */}
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-black text-white mb-0.5">کدهای تعمیر</h1>
-                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                                مدیریت کدهای TM ({allRequests.length} رکورد
-                                {isFetchingNextPage && ' • در حال بارگذاری...'})
-                            </p>
-                        </div>
-                        <div className="flex gap-2">
+                    {/* ── crumb + دکمه‌ها (مثل شاپ‌ها) ── */}
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faWrench}
+                            root="عملیات تعمیرگاه"
+                            current="لیست کدهای TM"
+                        />
+                        <div className="flex items-center gap-2">
                             <Link href="/requests/create">
-                                <button className="btn btn-success">
+                                <button className="btn btn-primary">
                                     <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                     افزودن کد تعمیر
                                 </button>
                             </Link>
                             <Link href="/components/RepairRequest">
-                                <button className="btn btn-warning">
+                                <button className="btn btn-secondary">
                                     ⚡ پذیرش مستقیم
                                 </button>
                             </Link>
                         </div>
                     </div>
-                </div>
 
-                <div className="p-6 max-w-7xl mx-auto">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-
-                        {/* DataTable — disablePagination چون infinite scroll داریم */}
                         <DataTable
                             data={allRequests}
                             columns={columns}
@@ -198,8 +191,11 @@ export default function RequestsListPage() {
                         {hasNextPage && (
                             <div ref={observerTarget} className="py-8 flex justify-center">
                                 <div className="flex items-center gap-3">
-                                    <FontAwesomeIcon icon={faSpinner} className="w-5 h-5 animate-spin"
-                                                     style={{ color: 'var(--primary)' }} />
+                                    <FontAwesomeIcon
+                                        icon={faSpinner}
+                                        className="w-5 h-5 animate-spin"
+                                        style={{ color: 'var(--primary)' }}
+                                    />
                                     <span className="text-sm font-semibold" style={{ color: 'var(--primary)' }}>
                                         در حال بارگذاری بیشتر...
                                     </span>
@@ -209,13 +205,14 @@ export default function RequestsListPage() {
 
                         {!hasNextPage && allRequests.length > 0 && (
                             <div className="py-5 text-center">
-                                <span className="inline-block px-5 py-2.5 rounded-xl text-sm font-semibold"
-                                      style={{ background: 'var(--surface-2)', color: 'var(--text-soft)' }}>
+                                <span
+                                    className="inline-block px-5 py-2.5 rounded-xl text-sm font-semibold"
+                                    style={{ background: 'var(--surface-2)', color: 'var(--text-soft)' }}
+                                >
                                     ✓ همه رکوردها بارگذاری شدند ({allRequests.length} رکورد)
                                 </span>
                             </div>
                         )}
-
                     </motion.div>
                 </div>
             </div>

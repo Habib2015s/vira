@@ -9,6 +9,7 @@ import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
 
 
@@ -156,27 +157,31 @@ export default function TmRequestsPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-black text-white mb-0.5 flex items-center gap-3">
-                                <FontAwesomeIcon icon={faClipboardList} className="w-6 h-6 opacity-90" />
-                                درخواست‌های تعمیر (TM Requests)
-                            </h1>
-                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>مدیریت درخواست‌های تعمیر ({allData.length} مورد)</p>
-                        </div>
+                <div className="page-content">
+
+                    {/* ── crumb + دکمه (مثل شاپ‌ها) ── */}
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faClipboardList}
+                            root="عملیات تعمیرگاه"
+                            current="درخواست‌های تعمیر"
+                        />
                         <Link href="/tmrequests/create">
-                            <button className="btn btn-success">
+                            <button className="btn btn-primary">
                                 <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                 درخواست جدید
                             </button>
                         </Link>
                     </div>
-                </div>
-                <div className="p-6 max-w-7xl mx-auto">
+
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                        <DataTable data={allData} columns={columns} loading={isLoading && allData.length === 0}
-                                   emptyMessage="هیچ درخواست تعمیری یافت نشد" disablePagination={true} />
+                        <DataTable
+                            data={allData}
+                            columns={columns}
+                            loading={isLoading && allData.length === 0}
+                            emptyMessage="هیچ درخواست تعمیری یافت نشد"
+                            disablePagination={true}
+                        />
                         {hasNextPage && (
                             <div ref={observerTarget} className="py-8 flex justify-center">
                                 <FontAwesomeIcon icon={faSpinner} className="w-5 h-5 animate-spin" style={{ color: 'var(--primary)' }} />

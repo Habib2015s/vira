@@ -3,8 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faShield, faPlus, faTrash, faSpinner, faXmark, faSave, faSyncAlt } from '@fortawesome/free-solid-svg-icons'
+import { faShield, faPlus, faTrash, faSpinner, faXmark, faSave } from '@fortawesome/free-solid-svg-icons'
 import DashboardLayout from '@/app/dashboard/Dashboardlayout'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import Swal from 'sweetalert2'
 import { ENV, getHeaders } from '@/app/config/env'
 
@@ -17,10 +18,16 @@ export default function RolesPage() {
 
     const { data, isLoading } = useQuery({
         queryKey: ['roles'],
-        queryFn: () => fetch(BASE, { headers: getHeaders() }).then(r => r.json()).then(r => r.data?.roles ?? []),
+        queryFn: async () => {
+            const res = await fetch(BASE, { headers: getHeaders() })
+            const json = await res.json()
+            const list = json?.data?.roles?.data ?? []
+            return Array.isArray(list) ? list : []
+        },
         staleTime: 5 * 60 * 1000,
     })
-    const roles = data ?? []
+
+    const roles = Array.isArray(data) ? data : []
 
     const createMutation = useMutation({
         mutationFn: (name) => fetch(BASE, { method: 'POST', headers: getHeaders(), body: JSON.stringify({ name }) }).then(r => r.json()),
@@ -43,25 +50,20 @@ export default function RolesPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
-                <div className="page-header-bar">
-                    <div className="max-w-4xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                <FontAwesomeIcon icon={faShield} className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">نقش‌ها</h1>
-                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>مدیریت نقش‌های سیستم ({roles.length} نقش)</p>
-                            </div>
-                        </div>
-                        <button onClick={() => setShowCreate(p => !p)} className="btn btn-success">
+                <div className="page-content">
+
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faShield}
+                            root="مدیریت سیستم"
+                            current="نقش‌ها"
+                        />
+                        <button onClick={() => setShowCreate(p => !p)} className="btn btn-primary">
                             <FontAwesomeIcon icon={showCreate ? faXmark : faPlus} className="w-4 h-4" />
                             {showCreate ? 'انصراف' : 'نقش جدید'}
                         </button>
                     </div>
-                </div>
 
-                <div className="page-content max-w-4xl">
                     {/* فرم ایجاد */}
                     <AnimatePresence>
                         {showCreate && (

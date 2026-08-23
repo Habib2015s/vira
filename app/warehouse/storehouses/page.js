@@ -3,22 +3,22 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faTrash, faSpinner, faPlus, faWarehouse, faEye, faPhone, faLocationDot, faHashtag } from '@fortawesome/free-solid-svg-icons'
+import { faPen, faTrash, faSpinner, faPlus, faWarehouse, faEye, faLocationDot } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
 
-const BASE    = ENV.API_WAREHOUSE_STOREHOUSES
+const BASE = ENV.API_WAREHOUSE_STOREHOUSES
 
 const fetchStorehouses = async ({ pageParam = null }) => {
     let url = BASE
     if (pageParam) url += `?cursor=${pageParam}`
 
     const res = await fetch(url, { headers: getHeaders() })
-
     const json = await res.json()
 
     if (!res.ok) {
@@ -30,6 +30,7 @@ const fetchStorehouses = async ({ pageParam = null }) => {
         next_cursor: json?.data?.storehouses?.next_cursor || null
     }
 }
+
 export default function StorehousesPage() {
     const observerTarget = useRef(null)
     const queryClient    = useQueryClient()
@@ -108,8 +109,8 @@ export default function StorehousesPage() {
                         style={{ color: 'var(--danger)' }}
                     />
                     <span className="text-sm" style={{ color: 'var(--text-soft)' }}>
-        {row.address || '—'}
-    </span>
+                        {row.address || '—'}
+                    </span>
                 </div>
             )
         },
@@ -148,34 +149,30 @@ export default function StorehousesPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                                 style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                <FontAwesomeIcon icon={faWarehouse} className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">انبارها</h1>
-                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                                    مدیریت انبارها ({allData.length} انبار)
-                                </p>
-                            </div>
-                        </div>
+                <div className="page-content">
+
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faWarehouse}
+                            root="انبار"
+                            current="لیست انبارها"
+                        />
                         <Link href="/warehouse/storehouses/create">
-                            <button className="btn btn-success">
+                            <button className="btn btn-primary">
                                 <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                 انبار جدید
                             </button>
                         </Link>
                     </div>
-                </div>
 
-                <div className="page-content max-w-7xl">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                        <DataTable data={allData} columns={columns}
-                                   loading={isLoading && allData.length === 0}
-                                   emptyMessage="هیچ انباری یافت نشد" disablePagination={true} />
+                        <DataTable
+                            data={allData}
+                            columns={columns}
+                            loading={isLoading && allData.length === 0}
+                            emptyMessage="هیچ انباری یافت نشد"
+                            disablePagination={true}
+                        />
                         {hasNextPage && (
                             <div ref={observerTarget} className="py-8 flex items-center justify-center gap-3">
                                 <FontAwesomeIcon icon={faSpinner} className="w-5 h-5 animate-spin" style={{ color: 'var(--primary)' }} />

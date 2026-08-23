@@ -18,11 +18,12 @@ const revenueData = [
     { name: '۹',  income: 5300, orders: 6800 },
 ]
 
+// ⭐⭐ تغییر اصلی: رنگ‌های رنگی و واضح به‌جای طیف خاکستری قبلی
 const categoryData = [
-    { name: 'ساعت',           value: 172500, count: 1275, color: '#18181b' },
-    { name: 'پوشاک',           value: 96500,  count: 970,  color: '#52525b' },
-    { name: 'ابزارهای هوشمند', value: 83500,  count: 830,  color: '#a1a1aa' },
-    { name: 'سایر',            value: 79800,  count: 532,  color: '#d4d4d8' },
+    { name: 'ساعت',           value: 172500, count: 1275, color: '#6366f1' }, // indigo
+    { name: 'پوشاک',           value: 96500,  count: 970,  color: '#06b6d4' }, // cyan
+    { name: 'ابزارهای هوشمند', value: 83500,  count: 830,  color: '#f59e0b' }, // amber
+    { name: 'سایر',            value: 79800,  count: 532,  color: '#f43f5e' }, // rose
 ]
 
 const fmt = (n) => n.toLocaleString('fa-IR')
@@ -75,11 +76,17 @@ export default function OverviewCharts() {
                     <h3 className="text-sm font-black" style={{ color: 'var(--text)' }}>درآمد و سفارشات</h3>
                     <div className="flex items-center gap-5">
                         <div>
-                            <p className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>کل درآمد</p>
+                            <p className="text-[10px] font-semibold flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
+                                <span className="w-2 h-2 rounded-full inline-block" style={{ background: '#6366f1' }} />
+                                کل درآمد
+                            </p>
                             <p className="text-base font-black" style={{ color: 'var(--text)' }}>۱۲۹,۴۴۰ ریال</p>
                         </div>
                         <div>
-                            <p className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>کل سفارشات</p>
+                            <p className="text-[10px] font-semibold flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
+                                <span className="w-2 h-2 rounded-full inline-block" style={{ background: '#06b6d4' }} />
+                                کل سفارشات
+                            </p>
                             <p className="text-base font-black" style={{ color: 'var(--text)' }}>۱.۸۱ هزار</p>
                         </div>
                     </div>
@@ -89,21 +96,22 @@ export default function OverviewCharts() {
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={revenueData} margin={{ top: 6, right: 4, left: -18, bottom: 0 }}>
                             <defs>
+                                {/* ⭐⭐ گرادیان‌ها هم رنگی شدن: بنفش-ایندیگو برای درآمد، فیروزه‌ای برای سفارشات */}
                                 <linearGradient id="gIncome" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor="#18181b" stopOpacity={0.35} />
-                                    <stop offset="100%" stopColor="#18181b" stopOpacity={0} />
+                                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.4} />
+                                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
                                 </linearGradient>
                                 <linearGradient id="gOrders" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor="#a1a1aa" stopOpacity={0.35} />
-                                    <stop offset="100%" stopColor="#a1a1aa" stopOpacity={0} />
+                                    <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.35} />
+                                    <stop offset="100%" stopColor="#06b6d4" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                             <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                             <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                             <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12 }} />
-                            <Area type="monotone" dataKey="orders" stroke="#a1a1aa" strokeWidth={2} fill="url(#gOrders)" />
-                            <Area type="monotone" dataKey="income" stroke="#18181b" strokeWidth={2.5} fill="url(#gIncome)" />
+                            <Area type="monotone" dataKey="orders" stroke="#06b6d4" strokeWidth={2} fill="url(#gOrders)" />
+                            <Area type="monotone" dataKey="income" stroke="#6366f1" strokeWidth={2.5} fill="url(#gIncome)" />
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>

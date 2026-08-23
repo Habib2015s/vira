@@ -8,12 +8,10 @@ import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
 
-
 const BASE = ENV.API_WAREHOUSE_TRANSFERS
-
-// const BASE = 'https://viratest2.ir/api/v1/warehouse/transfer_between_storehouses'
 
 const STATUS_LABEL = { pending: 'در انتظار', approved: 'تأیید', rejected: 'رد شده', imported: 'وارد', exported: 'خارج' }
 const STATUS_STYLE = {
@@ -65,9 +63,9 @@ export default function WarehouseTransfersPage() {
             render: (row) => (
                 <Link href={`/warehouse/transfers/edit/${row.id}`}>
                     <button className="w-9 h-9 flex items-center justify-center rounded-lg"
-                        style={{ color: 'var(--info)', background: 'var(--info-light)' }}
-                        onMouseEnter={e => e.currentTarget.style.filter = 'brightness(0.9)'}
-                        onMouseLeave={e => e.currentTarget.style.filter = 'none'}>
+                            style={{ color: 'var(--info)', background: 'var(--info-light)' }}
+                            onMouseEnter={e => e.currentTarget.style.filter = 'brightness(0.9)'}
+                            onMouseLeave={e => e.currentTarget.style.filter = 'none'}>
                         <FontAwesomeIcon icon={faPen} className="w-4 h-4" />
                     </button>
                 </Link>
@@ -78,24 +76,23 @@ export default function WarehouseTransfersPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-black text-white mb-0.5 flex items-center gap-3">
-                                <FontAwesomeIcon icon={faExchangeAlt} className="w-6 h-6 opacity-90" />
-                                انتقال بین انبارها
-                            </h1>
-                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>مدیریت انتقال کالا ({allData.length} مورد)</p>
-                        </div>
+                <div className="page-content">
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faExchangeAlt}
+                            root="انبار"
+                            current="انتقال بین انبارها"
+                        />
                         <Link href="/warehouse/transfers/create">
-                            <button className="btn btn-success"><FontAwesomeIcon icon={faPlus} className="w-4 h-4" /> انتقال جدید</button>
+                            <button className="btn btn-primary">
+                                <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+                                انتقال جدید
+                            </button>
                         </Link>
                     </div>
-                </div>
-                <div className="p-6 max-w-7xl mx-auto">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
                         <DataTable data={allData} columns={columns} loading={isLoading && allData.length === 0}
-                            emptyMessage="هیچ انتقالی یافت نشد" disablePagination={true} />
+                                   emptyMessage="هیچ انتقالی یافت نشد" disablePagination={true} />
                         {hasNextPage && <div ref={observerTarget} className="py-8 flex justify-center"><FontAwesomeIcon icon={faSpinner} className="w-5 h-5 animate-spin" style={{ color: 'var(--primary)' }} /></div>}
                     </motion.div>
                 </div>

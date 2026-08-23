@@ -12,9 +12,10 @@ import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
 
-const BASE    = ENV.API_WAREHOUSE_FACTORS
+const BASE = ENV.API_WAREHOUSE_FACTORS
 
 const STATUS_MAP = {
     'pre-invoice': { label: 'پیش‌فاکتور', badge: 'badge-warning'  },
@@ -43,7 +44,6 @@ export default function FactorsPage() {
         staleTime: 3 * 60 * 1000,
     })
 
-    // ── mutations ─────────────────────────────────────
     const confirmMutation = useMutation({
         mutationFn: (id) => fetch(`${BASE}/${id}/confirm`, { method: 'POST', headers: getHeaders() }).then(r => r.json()),
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['warehouseFactors'] }); Swal.fire({ title: 'تأیید شد!', icon: 'success', timer: 2000, showConfirmButton: false }) },
@@ -84,7 +84,6 @@ export default function FactorsPage() {
 
     const allData = data?.pages.flatMap(p => p.data) ?? []
 
-    // آمار
     const totalOwed = allData.reduce((s, f) => s + (f.amount_owed || 0), 0)
     const confirmed = allData.filter(f => f.status === 'confirmed').length
     const pending   = allData.filter(f => f.status === 'pre-invoice').length
@@ -168,8 +167,6 @@ export default function FactorsPage() {
                 const canCancel  = !row.is_canceled && row.status !== 'canceled'
                 return (
                     <div className="flex items-center justify-center gap-1">
-
-                        {/* ✏️ EDIT */}
                         <Link href={`/warehouse/factors/${row.id}/edit`}>
                             <button className="action-btn"
                                     title="ویرایش"
@@ -177,15 +174,11 @@ export default function FactorsPage() {
                                 <FontAwesomeIcon icon={faPen} className="w-3.5 h-3.5" />
                             </button>
                         </Link>
-
-                        {/* 👁 VIEW */}
                         <Link href={`/warehouse/factors/${row.id}`}>
                             <button className="action-btn action-btn-view" title="مشاهده">
                                 <FontAwesomeIcon icon={faEye} className="w-3.5 h-3.5" />
                             </button>
                         </Link>
-
-                        {/* 💳 PAYMENT */}
                         <Link href={`/warehouse/factors/${row.id}/payment`}>
                             <button className="action-btn"
                                     title="ثبت پرداخت"
@@ -193,24 +186,20 @@ export default function FactorsPage() {
                                 <FontAwesomeIcon icon={faCreditCard} className="w-3.5 h-3.5" />
                             </button>
                         </Link>
-
-                        {/* ✔ CONFIRM */}
                         {canConfirm && (
                             <button className="action-btn action-btn-toggle-off" title="تأیید"
                                     onClick={() => handleConfirm(row)}>
                                 <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />
                             </button>
                         )}
-
-                        {/* ❌ CANCEL */}
                         {canCancel && (
                             <button className="action-btn action-btn-delete" title="لغو"
                                     onClick={() => handleCancel(row)}>
                                 <FontAwesomeIcon icon={faBan} className="w-3.5 h-3.5" />
                             </button>
                         )}
-
-                    </div>                )
+                    </div>
+                )
             }
         }
     ]
@@ -218,55 +207,51 @@ export default function FactorsPage() {
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                                 style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                <FontAwesomeIcon icon={faFileInvoiceDollar} className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">فاکتورها</h1>
-                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                                    {allData.length} فاکتور — {confirmed} تأیید شده / {pending} در انتظار
-                                </p>
-                            </div>
-                        </div>
+                <div className="page-content">
+
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faFileInvoiceDollar}
+                            root="انبار"
+                            current="فاکتورها"
+                        />
                         <Link href="/warehouse/factors/create">
-                            <button className="btn btn-success">
+                            <button className="btn btn-primary">
                                 <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                 فاکتور جدید
                             </button>
                         </Link>
                     </div>
-                </div>
 
-                {/* آمار مالی */}
-                <div className="max-w-7xl mx-auto px-8 pt-5 grid grid-cols-4 gap-4">
-                    {[
-                        { label: 'کل فاکتورها',  value: allData.length,                 color: 'var(--primary)', bg: 'var(--primary-light)', icon: faFileInvoiceDollar, num: false },
-                        { label: 'تأیید شده',    value: confirmed,                      color: 'var(--success)', bg: 'var(--success-light)', icon: faCheck,             num: false },
-                        { label: 'در انتظار',    value: pending,                        color: 'var(--warning)', bg: 'var(--warning-light)', icon: faSpinner,           num: false },
-                        { label: 'کل مانده',     value: `${totalOwed.toLocaleString('fa-IR')} ﷼`, color: 'var(--danger)', bg: 'var(--danger-light)', icon: faCreditCard, num: true },
-                    ].map(({ label, value, color, bg, icon }) => (
-                        <motion.div key={label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                                    className="card p-4 flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: bg }}>
-                                <FontAwesomeIcon icon={icon} className="w-4 h-4" style={{ color }} />
-                            </div>
-                            <div>
-                                <p className="text-lg font-black leading-none" style={{ color }}>{value}</p>
-                                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{label}</p>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                    {/* آمار مالی */}
+                    <div className="grid grid-cols-4 gap-4 mb-5">
+                        {[
+                            { label: 'کل فاکتورها',  value: allData.length,                 color: 'var(--primary)', bg: 'var(--primary-light)', icon: faFileInvoiceDollar },
+                            { label: 'تأیید شده',    value: confirmed,                      color: 'var(--success)', bg: 'var(--success-light)', icon: faCheck },
+                            { label: 'در انتظار',    value: pending,                        color: 'var(--warning)', bg: 'var(--warning-light)', icon: faSpinner },
+                            { label: 'کل مانده',     value: `${totalOwed.toLocaleString('fa-IR')} ﷼`, color: 'var(--danger)', bg: 'var(--danger-light)', icon: faCreditCard },
+                        ].map(({ label, value, color, bg, icon }) => (
+                            <motion.div key={label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                                        className="card p-4 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: bg }}>
+                                    <FontAwesomeIcon icon={icon} className="w-4 h-4" style={{ color }} />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-black leading-none" style={{ color }}>{value}</p>
+                                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{label}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
 
-                <div className="page-content max-w-7xl">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                        <DataTable data={allData} columns={columns}
-                                   loading={isLoading && allData.length === 0}
-                                   emptyMessage="هیچ فاکتوری یافت نشد" disablePagination={true} />
+                        <DataTable
+                            data={allData}
+                            columns={columns}
+                            loading={isLoading && allData.length === 0}
+                            emptyMessage="هیچ فاکتوری یافت نشد"
+                            disablePagination={true}
+                        />
                         {hasNextPage && (
                             <div ref={observerTarget} className="py-8 flex items-center justify-center gap-3">
                                 <FontAwesomeIcon icon={faSpinner} className="w-5 h-5 animate-spin" style={{ color: 'var(--primary)' }} />

@@ -3,22 +3,17 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faTrash, faSpinner, faPlus, faUserCog } from '@fortawesome/free-solid-svg-icons'
+import { faPen, faTrash, faSpinner, faPlus, faUserCog, faEye } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 import DataTable from '@/app/components/DataTable/DataTable'
+import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'
-import { faEye } from '@fortawesome/free-solid-svg-icons'
 
 const BASE = ENV.API_REPAIRMEN
 
-
-// ⭐⭐ تغییر اصلی: مسیر استخراج داده اصلاح شد.
-// قبلاً `result.data.repairmen` مستقیم گرفته می‌شد که کل آبجکت pagination
-// (شامل data/per_page/next_cursor/...) بود، نه آرایه‌ی واقعی رکوردها.
-// دقیقاً مثل الگوی shops که از `result.data.shops.data` می‌خونه.
 const fetchRepairmen = async ({ pageParam = null }) => {
     let url = BASE
     if (pageParam) url += `?cursor=${pageParam}`
@@ -45,8 +40,6 @@ export default function RepairmenPage() {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
         queryKey: ['repairmen'],
         queryFn: fetchRepairmen,
-        // ⭐⭐ اضافه شد: تو نسخه فعلی React Query این فیلد الزامیه، بدونش
-        // ممکنه کوئری اصلاً درست اجرا نشه (مثل فایل storehouseUsers که این رو داشت)
         initialPageParam: null,
         getNextPageParam: (p) => p.next_cursor ?? undefined,
         staleTime: 5 * 60 * 1000,
@@ -117,21 +110,14 @@ export default function RepairmenPage() {
             label: 'عملیات',
             render: (row) => (
                 <div className="flex items-center justify-center gap-2">
-
-                    {/* 👁️ Show */}
                     <Link href={`/repairmen/${row.id}`}>
                         <button
                             className="w-9 h-9 flex items-center justify-center rounded-lg"
-                            style={{
-                                color: 'var(--primary)',
-                                background: 'var(--primary-light)'
-                            }}
+                            style={{ color: 'var(--primary)', background: 'var(--primary-light)' }}
                         >
                             <FontAwesomeIcon icon={faEye} className="w-4 h-4" />
                         </button>
                     </Link>
-
-                    {/* ✏️ Edit */}
                     <Link href={`/repairmen/edit/${row.id}`}>
                         <button className="w-9 h-9 flex items-center justify-center rounded-lg"
                                 style={{ color: 'var(--info)', background: 'var(--info-light)' }}
@@ -140,8 +126,6 @@ export default function RepairmenPage() {
                             <FontAwesomeIcon icon={faPen} className="w-4 h-4" />
                         </button>
                     </Link>
-
-                    {/* 🗑️ Delete */}
                     <button onClick={() => handleDelete(row)} disabled={deleteMutation.isPending}
                             className="w-9 h-9 flex items-center justify-center rounded-lg disabled:opacity-50"
                             style={{ color: 'var(--danger)', background: 'var(--danger-light)' }}
@@ -152,38 +136,38 @@ export default function RepairmenPage() {
                             className={`w-4 h-4 ${deleteMutation.isPending ? 'animate-spin' : ''}`}
                         />
                     </button>
-
                 </div>
             )
-        }    ]
+        }
+    ]
 
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
-                <div className="page-header-bar">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-black text-white mb-0.5 flex items-center gap-3">
-                                <FontAwesomeIcon icon={faUserCog} className="w-6 h-6 opacity-90" />
-                                تعمیرکاران
-                            </h1>
-                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                                مدیریت تعمیرکاران ({allData.length} نفر)
-                            </p>
-                        </div>
+                <div className="page-content">
+
+                    <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                        <PageCrumb
+                            icon={faUserCog}
+                            root="عملیات تعمیرگاه"
+                            current="لیست تعمیرکاران"
+                        />
                         <Link href="/repairmen/create">
-                            <button className="btn btn-success">
+                            <button className="btn btn-primary">
                                 <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                                 افزودن تعمیرکار
                             </button>
                         </Link>
                     </div>
-                </div>
 
-                <div className="p-6 max-w-7xl mx-auto">
                     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                        <DataTable data={allData} columns={columns} loading={isLoading && allData.length === 0}
-                                   emptyMessage="هیچ تعمیرکاری یافت نشد" disablePagination={true} />
+                        <DataTable
+                            data={allData}
+                            columns={columns}
+                            loading={isLoading && allData.length === 0}
+                            emptyMessage="هیچ تعمیرکاری یافت نشد"
+                            disablePagination={true}
+                        />
 
                         {hasNextPage && (
                             <div ref={observerTarget} className="py-8 flex justify-center">
