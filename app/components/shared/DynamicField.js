@@ -34,7 +34,7 @@ const select2Styles = {
     option:             (base, state) => ({
         ...base,
         background: state.isSelected ? 'var(--primary)' : state.isFocused ? 'var(--surface-2)' : 'transparent',
-        color: state.isSelected ? '#fff' : 'var(--text)',
+        color: state.isSelected ? 'var(--surface)' : 'var(--text)',
         padding: '10px 16px',
         cursor: 'pointer',
         fontSize: '13.5px',

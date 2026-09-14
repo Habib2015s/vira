@@ -30,7 +30,7 @@ const buildSelectStyles = () => ({
     option:     (base, state) => ({
         ...base, borderRadius: 'var(--radius-sm)', margin: '2px 0', cursor: 'pointer', fontSize: '13.5px',
         background: state.isSelected ? 'var(--primary)' : state.isFocused ? 'var(--surface-2)' : 'transparent',
-        color: state.isSelected ? '#fff' : 'var(--text)',
+        color: state.isSelected ? 'var(--surface)' : 'var(--text)',
     }),
     singleValue:        (base) => ({ ...base, color: 'var(--text)', fontSize: '13.5px' }),
     placeholder:        (base) => ({ ...base, color: 'var(--muted)', fontSize: '13.5px' }),

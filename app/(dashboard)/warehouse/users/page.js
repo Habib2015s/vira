@@ -47,7 +47,7 @@ const makeSelectStyles = (isDark) => ({
     option:      (b, s) => ({
         ...b, borderRadius: 'var(--radius-sm)', cursor: 'pointer',
         background:  s.isSelected ? 'var(--primary)' : s.isFocused ? 'var(--surface-2)' : 'transparent',
-        color:       s.isSelected ? '#fff' : 'var(--text)',
+        color:       s.isSelected ? 'var(--surface)' : 'var(--text)',
         fontSize:    '13.5px',
         '&:active':  { background: 'var(--primary)' }
     }),

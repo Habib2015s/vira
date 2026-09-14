@@ -25,7 +25,7 @@ const makeSelectStyles = () => ({
     option: (base, state) => ({
         ...base,
         background: state.isSelected ? 'var(--primary)' : state.isFocused ? 'var(--surface-2)' : 'transparent',
-        color: state.isSelected ? '#fff' : 'var(--text)',
+        color: state.isSelected ? 'var(--surface)' : 'var(--text)',
         fontSize: '12px', fontWeight: state.isSelected ? '700' : '500',
         borderRadius: '6px', margin: '2px 0', cursor: 'pointer',
     }),
@@ -86,7 +86,7 @@ function SearchInput({ colKey, colLabel, committedValue, onCommit }) {
                 {canApply && (
                     <motion.button initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }}
                                    onClick={commit} title="اعمال فیلتر"
-                                   style={{ width: 28, height: 28, borderRadius: 8, flexShrink: 0, border: 'none', cursor: 'pointer', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                   style={{ width: 28, height: 28, borderRadius: 8, flexShrink: 0, border: 'none', cursor: 'pointer', background: 'var(--primary)', color: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <FontAwesomeIcon icon={faCheck} style={{ width: 11, height: 11 }} />
                     </motion.button>
                 )}
@@ -153,7 +153,7 @@ function SelectInput({ colKey, colLabel, placeholder, options, committedValue, o
                 {canApply && (
                     <motion.button initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }}
                                    onClick={commit} title="اعمال فیلتر"
-                                   style={{ width: 28, height: 28, borderRadius: 8, flexShrink: 0, border: 'none', cursor: 'pointer', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                   style={{ width: 28, height: 28, borderRadius: 8, flexShrink: 0, border: 'none', cursor: 'pointer', background: 'var(--primary)', color: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <FontAwesomeIcon icon={faCheck} style={{ width: 11, height: 11 }} />
                     </motion.button>
                 )}
@@ -340,7 +340,7 @@ export default function DataTable({
             pages.push(
                 <button key={i} onClick={() => handlePageChange(i)}
                         className="px-3 py-1.5 rounded-lg text-sm font-bold transition-all"
-                        style={{ background: active ? 'var(--primary)' : 'var(--surface)', color: active ? '#fff' : 'var(--text-soft)', border: `1px solid ${active ? 'var(--primary)' : 'var(--border)'}`, boxShadow: active ? '0 2px 6px rgba(84,76,207,0.3)' : 'none' }}>
+                        style={{ background: active ? 'var(--primary)' : 'var(--surface)', color: active ? 'var(--surface)' : 'var(--text-soft)', border: `1px solid ${active ? 'var(--primary)' : 'var(--border)'}`, boxShadow: active ? '0 2px 6px rgba(84,76,207,0.3)' : 'none' }}>
                     {i + 1}
                 </button>
             )

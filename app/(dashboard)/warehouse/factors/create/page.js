@@ -23,7 +23,7 @@ const selectStyles = {
     }),
     menu:        (b) => ({ ...b, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', zIndex: 9999, boxShadow: 'var(--shadow-lg)' }),
     menuList:    (b) => ({ ...b, padding: '4px', background: 'var(--surface)' }),
-    option:      (b, s) => ({ ...b, borderRadius: '6px', background: s.isSelected ? 'var(--primary)' : s.isFocused ? 'var(--surface-2)' : 'transparent', color: s.isSelected ? '#fff' : 'var(--text)', fontSize: '13.5px' }),
+    option:      (b, s) => ({ ...b, borderRadius: '6px', background: s.isSelected ? 'var(--primary)' : s.isFocused ? 'var(--surface-2)' : 'transparent', color: s.isSelected ? 'var(--surface)' : 'var(--text)', fontSize: '13.5px' }),
     singleValue: (b) => ({ ...b, color: 'var(--text)', fontSize: '13.5px' }),
     placeholder: (b) => ({ ...b, color: 'var(--muted)', fontSize: '13.5px' }),
     input:       (b) => ({ ...b, color: 'var(--text)' }),
