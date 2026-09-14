@@ -9,7 +9,7 @@ import {
     faArrowLeft, faEdit, faStore, faCode, faTag, faMoneyBillWave,
     faToggleOn, faToggleOff, faClock, faFileAlt, faCircleCheck, faCircleXmark, faSpinner
 } from '@fortawesome/free-solid-svg-icons'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import Link from 'next/link'
 import { shopsApi } from '@/app/api/client/shopsApi'
 

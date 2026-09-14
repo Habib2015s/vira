@@ -9,7 +9,7 @@ import { faClipboardList, faSpinner, faArrowLeft, faPen, faCog, faUser,
     faListCheck, faFileLines, faTimes, faClock, faTruck, faRotateLeft,
     faWrench, faTrash, faLink, faFileContract } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 import Select from 'react-select'
 

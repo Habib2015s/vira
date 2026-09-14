@@ -19,7 +19,7 @@ import { useCityWaybillForm }               from "@/app/hooks/Usecitywaybillform
 // ⭐ مستقیم از API client استفاده میکنیم — نه Next.js route
 // چون Next.js server نمیتونه به viratest2.ir وصل بشه
 import { waybillsApi } from "@/app/api/client/waybillsApi"
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 
 export default function UniversalWaybillForm({ waybillType, mode = 'create', waybillId = null }) {
     const [loading,     setLoading]     = useState(mode === 'edit')

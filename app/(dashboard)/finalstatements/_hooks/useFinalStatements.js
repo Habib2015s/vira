@@ -3,7 +3,7 @@
 
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 

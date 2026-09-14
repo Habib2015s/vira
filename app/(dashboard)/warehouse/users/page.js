@@ -10,7 +10,7 @@ import {
     faXmark, faSave, faHashtag, faTriangleExclamation
 } from '@fortawesome/free-solid-svg-icons'
 import Select from 'react-select'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import DataTable from '@/app/components/DataTable/DataTable'
 import { ENV, getHeaders } from '@/app/config/env'
 

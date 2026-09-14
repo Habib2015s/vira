@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faArrowLeft, faPen, faSpinner, faUser, faBuilding,
     faPhone, faLocationDot, faHashtag, faIdCard, faMailBulk, faCalendar } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_CUSTOMERS

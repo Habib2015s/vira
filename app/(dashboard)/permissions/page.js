@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faKey, faSpinner, faSyncAlt, faCheck, faSearch } from '@fortawesome/free-solid-svg-icons'
 import PageCrumb from '@/app/components/PageHeader/PageCrumb'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 export default function PermissionsPage() {

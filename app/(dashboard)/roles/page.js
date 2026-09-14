@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShield, faPlus, faTrash, faSpinner, faXmark, faSave } from '@fortawesome/free-solid-svg-icons'
 import PageCrumb from '@/app/components/PageHeader/PageCrumb'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE = ENV.API_ROLES

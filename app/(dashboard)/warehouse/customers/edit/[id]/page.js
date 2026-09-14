@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faSave, faArrowLeft, faSpinner, faUser, faBuilding } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_CUSTOMERS

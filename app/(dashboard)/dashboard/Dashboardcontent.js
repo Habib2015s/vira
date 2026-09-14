@@ -3,10 +3,21 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faHouse, faWallet, faCalendar } from "@fortawesome/free-solid-svg-icons"
 import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import StatsCards from '@/app/cards/Statscards'
 import KpiRow from "@/app/components/Dashboardoverview/Kpirow";
-import OverviewCharts from "@/app/components/Dashboardoverview/Overviewcharts";
+
+// ⭐ recharts (کتابخونهٔ نمودار، نسبتاً سنگین) رو دیگه مستقیم توی باندل اولیهٔ
+// صفحهٔ داشبورد (اولین صفحه بعد از لاگین) نمی‌ذاریم — با next/dynamic فقط بعد
+// از رندر اولیهٔ صفحه، جدا از بقیهٔ کد لود میشه. ssr:false چون نمودار فقط
+// سمت کلاینت معنی داره (نیازی به سئو/رندر سروری نداره).
+const OverviewCharts = dynamic(() => import("@/app/components/Dashboardoverview/Overviewcharts"), {
+    ssr: false,
+    loading: () => (
+        <div className="rounded-2xl animate-pulse" style={{ height: 320, background: 'var(--surface-2)', border: '1px solid var(--border)' }} />
+    ),
+})
 
 export default function DashboardContent() {
     return (

@@ -9,7 +9,7 @@ import {
     faArrowLeft, faTicket, faPaperPlane, faSpinner, faHeadset,
     faUser, faXmark, faCircle, faTag, faClock
 } from '@fortawesome/free-solid-svg-icons'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 const STATUS_LABEL = { open: 'باز', closed: 'بسته', pending: 'در انتظار' }

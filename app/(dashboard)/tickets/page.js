@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faPlus, faTicket, faEye, faLockOpen, faXmark, faPaperPlane, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import DataTable from '@/app/components/DataTable/DataTable'
 import { ENV, getHeaders } from '@/app/config/env'
 

@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faArrowLeft, faPlus, faTrash, faWrench, faClipboardList, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import Select from 'react-select'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_TM_REQUESTS

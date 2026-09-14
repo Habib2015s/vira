@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserCog, faSpinner, faSave, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE = ENV.API_REPAIRMEN

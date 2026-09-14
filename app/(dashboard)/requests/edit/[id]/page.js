@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faTrash, faArrowLeft, faSave, faSearch, faSpinner, faWrench } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from 'next/navigation'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import Select from 'react-select'
 import { ENV } from '@/app/config/env'
 

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faArrowLeft, faExclamationCircle, faSpinner } from '@fortawesome/free-solid-svg-icons'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { shopsApi } from '@/app/api/client/shopsApi'
 import { shopsCache } from '@/app/hooks/useShops'
 

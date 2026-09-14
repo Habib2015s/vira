@@ -9,7 +9,7 @@ import { faFileInvoiceDollar, faArrowLeft, faSpinner, faCheck, faBan,
     faCreditCard, faBox, faUser, faHashtag, faCalendar,
     faTrash, faRotateLeft, faPen } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 const BASE    = ENV.API_WAREHOUSE_FACTORS

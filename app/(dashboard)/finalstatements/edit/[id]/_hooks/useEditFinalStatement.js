@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import moment from 'moment-jalaali'
 import { ENV, getHeaders } from '@/app/config/env'
 

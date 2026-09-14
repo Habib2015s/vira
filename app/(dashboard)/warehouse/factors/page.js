@@ -9,7 +9,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import DataTable from '@/app/components/DataTable/DataTable'
 import PageCrumb from '@/app/components/PageHeader/PageCrumb'
 import { ENV, getHeaders } from '@/app/config/env'

@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExclamationCircle, faSpinner, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 
 // ⭐⭐⭐ نکته: مطمئن نیستیم مرکز هزینه دقیقاً همین endpoint هست یا نه.

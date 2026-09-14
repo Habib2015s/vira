@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faArrowLeft, faBox, faSpinner, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
-import Swal from 'sweetalert2'
+import Swal from '@/app/utils/swal'
 import { ENV, getHeaders } from '@/app/config/env'
 import PersianDatePicker from '@/app/components/shared/PersianDatePicker'
 
