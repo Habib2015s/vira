@@ -353,68 +353,70 @@ export default function DataTable({
              style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow)' }}>
 
             {/* نوار بالا */}
-            <div className="flex items-center gap-3 px-5 py-3 flex-wrap"
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-3 sm:px-5 py-3"
                  style={{ borderBottom: '2px solid var(--border)', background: 'var(--surface-2)' }}>
                 {(titleIcon || title) && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full sm:w-auto min-w-0">
                         {titleIcon && (
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--primary-light)' }}>
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'var(--primary-light)' }}>
                                 <FontAwesomeIcon icon={titleIcon} className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                             </div>
                         )}
-                        {title && <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>{title}</span>}
+                        {title && <span className="text-sm font-bold truncate" style={{ color: 'var(--text)' }}>{title}</span>}
                     </div>
                 )}
-                <div className="flex-1" />
-                <ActiveFiltersPopup filters={filters} searches={searches} columns={columns}
-                                    onClearOne={clearOneFilter} onClearAll={clearAllFilters} />
+                <div className="flex-1 hidden sm:block" />
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <ActiveFiltersPopup filters={filters} searches={searches} columns={columns}
+                                        onClearOne={clearOneFilter} onClearAll={clearAllFilters} />
 
-                <button onClick={() => setFiltersOpen(v => !v)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold"
-                        style={{
-                            background: filtersOpen ? 'var(--primary-light)' : 'var(--surface)',
-                            color: filtersOpen ? 'var(--primary)' : 'var(--text-soft)',
-                            border: `1.5px solid ${filtersOpen ? 'var(--primary)' : 'var(--border)'}`,
-                        }}>
-                    <FontAwesomeIcon icon={faFilter} className="w-3 h-3" />
-                    فیلتر
-                </button>
+                    <button onClick={() => setFiltersOpen(v => !v)}
+                            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex-shrink-0"
+                            style={{
+                                background: filtersOpen ? 'var(--primary-light)' : 'var(--surface)',
+                                color: filtersOpen ? 'var(--primary)' : 'var(--text-soft)',
+                                border: `1.5px solid ${filtersOpen ? 'var(--primary)' : 'var(--border)'}`,
+                            }}>
+                        <FontAwesomeIcon icon={faFilter} className="w-3 h-3" />
+                        فیلتر
+                    </button>
 
-                <button onClick={exportCsv}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold"
-                        style={{ background: 'var(--surface)', color: 'var(--text-soft)', border: '1.5px solid var(--border)' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text)' }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.color = 'var(--text-soft)' }}>
-                    <FontAwesomeIcon icon={faFileExport} className="w-3 h-3" />
-                    خروجی CSV
-                </button>
+                    <button onClick={exportCsv}
+                            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex-shrink-0"
+                            style={{ background: 'var(--surface)', color: 'var(--text-soft)', border: '1.5px solid var(--border)' }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text)' }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.color = 'var(--text-soft)' }}>
+                        <FontAwesomeIcon icon={faFileExport} className="w-3 h-3" />
+                        خروجی CSV
+                    </button>
 
-                <AnimatePresence>
-                    {hasActiveFilters && (
-                        <motion.button initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }}
-                                       onClick={clearAllFilters}
-                                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold"
-                                       style={{ background: 'var(--danger-light)', color: 'var(--danger)' }}>
-                            <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />پاک کردن همه
-                        </motion.button>
-                    )}
-                </AnimatePresence>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
-                     style={{ background: hasActiveFilters ? 'var(--warning-light)' : 'var(--primary-light)', border: `1.5px solid ${hasActiveFilters ? 'var(--warning)' : 'var(--primary)'}` }}>
-                    <LiveCountIcon count={filteredData.length} isFiltered={hasActiveFilters} />
-                    <div className="flex flex-col leading-none">
-                        <span className="text-[10px] font-semibold" style={{ color: hasActiveFilters ? 'var(--warning)' : 'var(--primary)', opacity: 0.85 }}>
-                            {hasActiveFilters ? 'نتایج فیلتر' : 'کل رکوردها'}
-                        </span>
-                        <motion.span key={filteredData.length} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-                                     transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                                     className="text-lg font-black leading-none mt-0.5"
-                                     style={{ color: hasActiveFilters ? 'var(--warning)' : 'var(--primary)' }}>
-                            {filteredData.length}
-                            {hasActiveFilters && data.length !== filteredData.length && (
-                                <span className="text-xs font-normal opacity-60 mr-1">از {data.length}</span>
-                            )}
-                        </motion.span>
+                    <AnimatePresence>
+                        {hasActiveFilters && (
+                            <motion.button initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }}
+                                           onClick={clearAllFilters}
+                                           className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex-shrink-0"
+                                           style={{ background: 'var(--danger-light)', color: 'var(--danger)' }}>
+                                <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />پاک کردن همه
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl w-full sm:w-auto justify-center sm:justify-start"
+                         style={{ background: hasActiveFilters ? 'var(--warning-light)' : 'var(--primary-light)', border: `1.5px solid ${hasActiveFilters ? 'var(--warning)' : 'var(--primary)'}` }}>
+                        <LiveCountIcon count={filteredData.length} isFiltered={hasActiveFilters} />
+                        <div className="flex flex-col leading-none">
+                            <span className="text-[10px] font-semibold" style={{ color: hasActiveFilters ? 'var(--warning)' : 'var(--primary)', opacity: 0.85 }}>
+                                {hasActiveFilters ? 'نتایج فیلتر' : 'کل رکوردها'}
+                            </span>
+                            <motion.span key={filteredData.length} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+                                         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                                         className="text-lg font-black leading-none mt-0.5"
+                                         style={{ color: hasActiveFilters ? 'var(--warning)' : 'var(--primary)' }}>
+                                {filteredData.length}
+                                {hasActiveFilters && data.length !== filteredData.length && (
+                                    <span className="text-xs font-normal opacity-60 mr-1">از {data.length}</span>
+                                )}
+                            </motion.span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -427,8 +429,8 @@ export default function DataTable({
                     {filtersOpen && (
                         <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
                             {columns.map((col, i) => (
-                                <th key={i} className="px-2 py-2"
-                                    style={{ borderLeft: i < columns.length - 1 ? '1px solid var(--border)' : 'none', minWidth: '90px' }}>
+                                <th key={i} className="px-1.5 sm:px-2 py-1.5 sm:py-2"
+                                    style={{ borderLeft: i < columns.length - 1 ? '1px solid var(--border)' : 'none', minWidth: '80px' }}>
                                     {col.filter?.type === 'select' ? (
                                         /* ⭐ select هم با تیک تایید */
                                         <SelectInput
@@ -455,7 +457,7 @@ export default function DataTable({
                     {/* هدر ستون‌ها */}
                     <tr style={{ background: 'var(--surface-2)' }}>
                         {columns.map((col, i) => (
-                            <th key={i} className="px-4 py-3 text-center text-sm font-bold"
+                            <th key={i} className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold"
                                 style={{ color: 'var(--text)', borderBottom: '1.5px solid var(--border)', borderLeft: i < columns.length - 1 ? '1px solid var(--border)' : 'none', whiteSpace: 'nowrap' }}>
                                 {col.label}
                             </th>
