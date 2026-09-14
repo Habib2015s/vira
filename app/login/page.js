@@ -44,7 +44,8 @@ export default function LoginPage() {
                     </motion.div>
 
                     <div className="mb-5">
-                        <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-200 via-white to-indigo-300 bg-clip-text text-transparent">
+                        <h1 className="font-black bg-gradient-to-r from-indigo-200 via-white to-indigo-300 bg-clip-text text-transparent"
+                            style={{ fontSize: 'clamp(20px, 5.5vw, 30px)' }}>
                             سیستم مدیریت حمل و نقل ویرا
                         </h1>
                     </div>

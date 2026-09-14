@@ -168,11 +168,15 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
     return (
         <>
-            <button onClick={() => setIsOpen(!isOpen)}
-                    className="lg:hidden fixed top-3 right-3 z-50 w-10 h-10 flex items-center justify-center rounded-xl shadow-md"
-                    style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                <FontAwesomeIcon icon={isOpen ? faXmark : faBars} className="w-5 h-5" style={{ color: 'var(--text-soft)' }} />
-            </button>
+            {/* دکمه باز کردن کشو — فقط وقتی بسته‌ست نمایش داده میشه؛ وقتی باز شد به‌جاش دکمه بستن
+                داخل خود هدر کشو (پایین) نمایش داده میشه، نه شناور روی گوشه صفحه که روی لوگو می‌افتاد */}
+            {!isOpen && (
+                <button onClick={() => setIsOpen(true)}
+                        className="lg:hidden fixed top-3 right-3 z-50 w-10 h-10 flex items-center justify-center rounded-xl shadow-md"
+                        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+                    <FontAwesomeIcon icon={faBars} className="w-5 h-5" style={{ color: 'var(--text-soft)' }} />
+                </button>
+            )}
 
             <AnimatePresence>
                 {isOpen && (
@@ -205,12 +209,22 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         )}
                     </AnimatePresence>
                     {isOpen && (
-                        <button onClick={() => setIsOpen(false)} className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg shrink-0 transition-all"
-                                style={{ color: 'var(--text-muted)' }}
-                                onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-2)'}
-                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                            <FontAwesomeIcon icon={faChevronRight} className="w-4 h-4" />
-                        </button>
+                        <>
+                            {/* دسکتاپ: جمع کردن سایدبار به نوار آیکون */}
+                            <button onClick={() => setIsOpen(false)} className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg shrink-0 transition-all"
+                                    style={{ color: 'var(--text-muted)' }}
+                                    onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-2)'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                <FontAwesomeIcon icon={faChevronRight} className="w-4 h-4" />
+                            </button>
+                            {/* موبایل: بستن کامل کشو — داخل خود هدر کشو، نه شناور روی گوشه صفحه */}
+                            <button onClick={() => setIsOpen(false)} className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg shrink-0 transition-all"
+                                    style={{ color: 'var(--text-muted)' }}
+                                    onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-2)'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
+                            </button>
+                        </>
                     )}
                 </div>
 
