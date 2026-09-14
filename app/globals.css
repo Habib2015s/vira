@@ -5,22 +5,25 @@
    ═══════════════════════════════════════════════════ */
 
 :root {
-    /* ── مونوکروم: مشکی / سفید / خاکستری ── */
-    --primary:        #18181b;
-    --primary-hover:  #000000;
-    --primary-light:  #e4e4e7;
-    --primary-subtle: #f4f4f5;
-    --primary-dark:   #09090b;
+    /* ── ساختار عمومی صفحه (پس‌زمینه/سطح/متن): مشکی، سفید، خاکستری ──
+       رنگ فقط روی عناصر تعاملی/وضعیتی (دکمه‌ها، عملیات، چارت‌ها) می‌مونه؛
+       همون بنفشی که از قبل جاهای دیگه (DataTable، صفحه لاگین، StatsCards)
+       به‌صورت hardcode استفاده شده بود (rgba(84,76,207)) اینجا هم همینه. */
+    --primary:        #544ccf;
+    --primary-hover:  #4338ca;
+    --primary-light:  #ece9fb;
+    --primary-subtle: #f5f3fe;
+    --primary-dark:   #3d3591;
 
-    /* ── وضعیت‌ها (فقط برای شاخص‌های آماری/چارت نگه داشته شده) ── */
+    /* ── وضعیت‌ها (برای دکمه‌های عملیات، بج‌ها، چارت‌ها) ── */
     --success:        #16a34a;
     --success-light:  #dcfce7;
     --warning:        #d97706;
     --warning-light:  #fef3c7;
     --danger:         #dc2626;
     --danger-light:   #fee2e2;
-    --info:           #52525b;
-    --info-light:     #f4f4f5;
+    --info:           #0284c7;
+    --info-light:     #e0f2fe;
 
     --bg:             #f4f4f5;
     --surface:        #ffffff;
@@ -57,11 +60,11 @@
    ═══════════════════════════════════════════════════ */
 
 .dark, [data-theme="dark"] {
-    --primary:        #e4e4e7;
-    --primary-hover:  #ffffff;
-    --primary-light:  #27272a;
-    --primary-subtle: #1f1f22;
-    --primary-dark:   #f4f4f5;
+    --primary:        #7c72e0;
+    --primary-hover:  #6d62d4;
+    --primary-light:  #1e1b4b;
+    --primary-subtle: #1a1740;
+    --primary-dark:   #a5b4fc;
 
     --success:        #34d399;
     --success-light:  #052e16;
@@ -69,8 +72,8 @@
     --warning-light:  #1c1200;
     --danger:         #f87171;
     --danger-light:   #2d0a0a;
-    --info:           #a1a1aa;
-    --info-light:     #27272a;
+    --info:           #38bdf8;
+    --info-light:     #082030;
 
     --bg:             #0a0a0b;
     --surface:        #131316;
@@ -186,15 +189,13 @@ body {
    سبز  (btn-success)                → ثبت / ذخیره / ایجاد / تایید
    قرمز (btn-danger)                 → حذف
    زرد  (btn-warning, btn-back, btn-ghost) → ویرایش / انصراف / بازگشت
-   مشکی (btn-primary)                → اکشن‌های خنثی/عمومی
+   بنفش (btn-primary)                → اکشن‌های خنثی/عمومی (افزودن و...)
    خاکستری (btn-secondary)           → اکشن‌های ثانویه
    ═══════════════════════════════════ */
 
-.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 1px 3px rgba(24,24,27,0.3); }
-.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); box-shadow: 0 4px 12px rgba(24,24,27,0.35); transform: translateY(-1px); }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 1px 3px rgba(84,76,207,0.3); }
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); box-shadow: 0 4px 12px rgba(84,76,207,0.35); transform: translateY(-1px); }
 .btn-primary:active { transform: translateY(0); }
-.dark .btn-primary, [data-theme="dark"] .btn-primary { box-shadow: 0 1px 3px rgba(228,228,231,0.15); color: #000; }
-.dark .btn-primary:hover, [data-theme="dark"] .btn-primary:hover { box-shadow: 0 4px 12px rgba(228,228,231,0.25); color: #000; }
 
 /* ─── سبز: ثبت / ذخیره / ایجاد ─── */
 .btn-success { background: #16a34a; color: #fff; border-color: #16a34a; box-shadow: 0 1px 3px rgba(22,163,74,0.25); }
@@ -258,7 +259,7 @@ body {
 .form-input:hover, .form-select:hover { border-color: var(--border-strong); }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(24,24,27,0.1);
+    box-shadow: 0 0 0 3px rgba(84,76,207,0.1);
 }
 .dark .form-input:focus, .dark .form-select:focus, .dark .form-textarea:focus,
 [data-theme="dark"] .form-input:focus, [data-theme="dark"] .form-select:focus, [data-theme="dark"] .form-textarea:focus {
@@ -328,12 +329,11 @@ body {
    ═══════════════════════════════════════════════════ */
 
 .page-header-bar {
-    background: #18181b;
+    background: var(--primary);
     padding: 14px 24px;
     box-shadow: var(--shadow-md);
 }
 .dark .page-header-bar, [data-theme="dark"] .page-header-bar {
-    background: #000000;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 .page-content { padding: 18px 12px 20px 20px; max-width: 100%; margin: 0; } /* padding-right کوچیک چون سمت راست به سایدبار می‌چسبد */
@@ -350,7 +350,7 @@ body {
 .crumb-bar .crumb-text { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .crumb-bar .crumb-root { font-size: 13px; font-weight: 600; color: var(--text-muted); }
 .crumb-bar .crumb-sep  { font-size: 12px; color: var(--muted); }
-.crumb-bar .crumb-current { font-size: 16px; font-weight: 800; color: var(--text); }
+.crumb-bar .crumb-current { font-size: 16px; font-weight: 800; color: var(--text-soft); }
 
 /* ═══════════════════════════════════════════════════
    🔔 ALERT
@@ -438,7 +438,7 @@ body {
     outline: 2px solid var(--primary) !important;
     outline-offset: 2px !important;
 }
-.swal2-timer-progress-bar { background: rgba(24,24,27,0.5) !important; }
+.swal2-timer-progress-bar { background: rgba(84,76,207,0.5) !important; }
 
 /* ── لایت مود Swal ── */
 .swal2-popup {
