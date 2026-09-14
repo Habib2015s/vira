@@ -1,25 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from "@/app/components/Sidebar/Sidebar"
 import Header from "@/app/header/Header"
 
 export default function DashboardLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
+    // روی موبایل سایدبار پیش‌فرض بسته باشه (به‌صورت کشو روی محتوا باز میشه، نه کنارش)
+    useEffect(() => {
+        if (window.innerWidth < 1024) setIsSidebarOpen(false)
+    }, [])
+
     return (
         <div className="flex min-h-screen" style={{ background: 'var(--bg)' }}>
             {/* Sidebar */}
-            <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} style={{
-                marginRight: isSidebarOpen ? '256px' : '96px'
-            }}
-            />
+            <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-            {/* Main Content */}
+            {/* Main Content — فاصله برای سایدبار فقط از lg به بالا رزرو میشه؛ زیر آن سایدبار به‌صورت کشوی روی محتوا نمایش داده میشه */}
             <div
                 className={`
                     flex-1 min-h-screen transition-all duration-300
-                    ${isSidebarOpen ? 'mr-64' : 'mr-20'}
+                    ${isSidebarOpen ? 'lg:mr-64' : 'lg:mr-20'}
                 `}
             >
                 <Header />
