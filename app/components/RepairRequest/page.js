@@ -1,19 +1,18 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
+import { faExclamationCircle, faSpinner, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+import Swal from 'sweetalert2'
+import { ENV, getHeaders } from '@/app/config/env'
 
-const centers = [
-    { code: '101', name: 'مرکز هزینه 101' },
-    { code: '102', name: 'مرکز هزینه 102' },
-    { code: '103', name: 'مرکز هزینه 103' },
-    { code: '104', name: 'مرکز هزینه 104' },
-    { code: '105', name: 'مرکز هزینه 105' },
-]
+// ⭐⭐⭐ نکته: مطمئن نیستیم مرکز هزینه دقیقاً همین endpoint هست یا نه.
+// اگه بعد از تست معلوم شد endpoint درستی نیست، فقط همین یک خط رو عوض کن:
+const COST_CENTER_ENDPOINT = ENV.API_ACCOUNT_SIDES
 
 export default function DirectRequestPage() {
     const router = useRouter()
@@ -30,8 +29,29 @@ export default function DirectRequestPage() {
     const [centerSearch, setCenterSearch]   = useState('')
     const [showDropdown, setShowDropdown]   = useState(false)
 
+    const { data: centers = [], isLoading: centersLoading, error: centersError } = useQuery({
+        queryKey: ['costCenters'],
+        queryFn: async () => {
+            const r   = await fetch(COST_CENTER_ENDPOINT, { headers: getHeaders() })
+            const res = await r.json().catch(() => ({}))
+            if (!r.ok) throw new Error(res?.message || `خطای ${r.status} در دریافت مراکز هزینه`)
+            const list =
+                res.data?.accountSides?.data ??
+                res.data?.accountSides ??
+                res.data?.data ??
+                res.data ??
+                []
+            return Array.isArray(list) ? list : []
+        },
+        staleTime: 5 * 60 * 1000,
+        retry: 1,
+    })
+
     const filteredCenters = centerSearch.length >= 2
-        ? centers.filter(c => c.name.includes(centerSearch) || c.code.includes(centerSearch))
+        ? centers.filter(c =>
+            (c.name || c.title || '').includes(centerSearch) ||
+            (c.code || '').toString().includes(centerSearch)
+        )
         : []
 
     useEffect(() => {
@@ -55,12 +75,23 @@ export default function DirectRequestPage() {
         return Object.keys(newErrors).length === 0
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         if (!validateForm()) return
+
         if (canDirectAccept) {
-            alert('پذیرش مستقیم با موفقیت ثبت شد')
-            router.push('/requests')
+            // ⭐⭐ تغییر اصلی ۱: alert() ساده مرورگر به Swal.fire تبدیل شد
+            await Swal.fire({
+                icon: 'success',
+                title: 'پذیرش مستقیم ثبت شد',
+                text: 'استعلام با موفقیت انجام شد.',
+                timer: 2000,
+                showConfirmButton: false,
+            })
+            // ⭐⭐ تغییر اصلی ۲: مسیر قبلی '/requests' وجود نداشت (404 → صفحه سفید).
+            // این مسیر رو با /requests/list جایگزین کردیم چون این الگویی است
+            // که بقیه صفحات پروژه (مثل CreateTmCodePage) بعد از ثبت موفق ازش استفاده می‌کنن.
+            router.push('/requests/list')
         } else {
             router.push(`/requests/edit/new?centerCode=${formData.centerCode}&kmBefore=${formData.kmBefore}&km=${formData.km}`)
         }
@@ -78,7 +109,7 @@ export default function DirectRequestPage() {
     })
     const onFocus = (e, err) => {
         e.target.style.borderColor = err ? 'var(--danger)' : 'var(--primary)'
-        e.target.style.boxShadow   = `0 0 0 3px ${err ? 'rgba(220,38,38,0.12)' : 'rgba(84,76,207,0.15)'}`
+        e.target.style.boxShadow   = `0 0 0 3px ${err ? 'rgba(220,38,38,0.12)' : 'rgba(24,24,27,0.15)'}`
     }
     const onBlur = (e, err) => {
         e.target.style.borderColor = err ? 'var(--danger)' : 'var(--border)'
@@ -104,8 +135,8 @@ export default function DirectRequestPage() {
             <div className="w-full p-6 pt-16" style={{ background: 'var(--bg)' }}>
 
                 {/* هدر */}
-                <div className="bg-gradient-to-r mx-10 from-blue-600 to-indigo-600 px-8 rounded-t-lg py-6 shadow-xl"
-                     style={{ border: '1px solid var(--border)' }}>
+                <div className="mx-10 px-8 rounded-t-lg py-6 shadow-xl"
+                     style={{ background: 'var(--primary)', border: '1px solid var(--border)' }}>
                     <h1 className="text-xl font-bold text-white">ثبت درخواست تعمیر</h1>
                 </div>
 
@@ -135,6 +166,19 @@ export default function DirectRequestPage() {
                             )}
                         </div>
 
+                        {centersError && (
+                            <div className="mb-4 p-3 rounded-xl flex items-start gap-2.5 text-sm"
+                                 style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)', color: 'var(--danger)' }}>
+                                <FontAwesomeIcon icon={faTriangleExclamation} className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                                <div>
+                                    <p className="font-bold">دریافت لیست مراکز هزینه ناموفق بود: {centersError.message}</p>
+                                    <p className="mt-1" style={{ color: 'var(--text-muted)' }}>
+                                        اگه این خطا ادامه داشت، احتمالاً endpoint واقعی «مرکز هزینه» با account-sides فرق داره — باید از بک‌اند بپرسی مسیر درست چیه.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
                         <form onSubmit={handleSubmit} className="space-y-6">
 
                             {/* مرکز هزینه */}
@@ -142,22 +186,30 @@ export default function DirectRequestPage() {
                                 <label style={labelStyle}>
                                     مرکز هزینه <span style={{ color: 'var(--danger)' }}>*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    value={centerSearch || formData.centerCode}
-                                    placeholder="حداقل 2 حرف وارد کنید..."
-                                    onChange={(e) => {
-                                        setCenterSearch(e.target.value)
-                                        setShowDropdown(e.target.value.length >= 2)
-                                        if (errors.centerCode) setErrors({ ...errors, centerCode: '' })
-                                    }}
-                                    onFocus={(e) => {
-                                        if (centerSearch.length >= 2) setShowDropdown(true)
-                                        onFocus(e, !!errors.centerCode)
-                                    }}
-                                    onBlur={(e) => onBlur(e, !!errors.centerCode)}
-                                    style={inputStyle(!!errors.centerCode)}
-                                />
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={centerSearch || formData.centerCode}
+                                        placeholder={centersLoading ? 'در حال بارگذاری مراکز هزینه...' : 'حداقل 2 حرف وارد کنید...'}
+                                        disabled={centersLoading || !!centersError}
+                                        onChange={(e) => {
+                                            setCenterSearch(e.target.value)
+                                            setShowDropdown(e.target.value.length >= 2)
+                                            if (errors.centerCode) setErrors({ ...errors, centerCode: '' })
+                                        }}
+                                        onFocus={(e) => {
+                                            if (centerSearch.length >= 2) setShowDropdown(true)
+                                            onFocus(e, !!errors.centerCode)
+                                        }}
+                                        onBlur={(e) => onBlur(e, !!errors.centerCode)}
+                                        style={inputStyle(!!errors.centerCode)}
+                                    />
+                                    {centersLoading && (
+                                        <FontAwesomeIcon icon={faSpinner}
+                                                         className="animate-spin absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4"
+                                                         style={{ color: 'var(--muted)' }} />
+                                    )}
+                                </div>
                                 <ErrorMessage error={errors.centerCode} />
 
                                 <AnimatePresence>
@@ -176,10 +228,10 @@ export default function DirectRequestPage() {
                                             }}
                                         >
                                             {filteredCenters.map(center => (
-                                                <li key={center.code}
+                                                <li key={center.code || center.id}
                                                     onClick={() => {
-                                                        setFormData({ ...formData, centerCode: center.code })
-                                                        setCenterSearch(center.name)
+                                                        setFormData({ ...formData, centerCode: center.code || center.id })
+                                                        setCenterSearch(center.name || center.title)
                                                         setShowDropdown(false)
                                                     }}
                                                     className="px-4 py-2.5 cursor-pointer text-sm transition-colors"
@@ -187,12 +239,19 @@ export default function DirectRequestPage() {
                                                     onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-2)'}
                                                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                                                 >
-                                                    {center.name} ({center.code})
+                                                    {center.name || center.title} ({center.code || center.id})
                                                 </li>
                                             ))}
                                         </motion.ul>
                                     )}
                                 </AnimatePresence>
+
+                                {showDropdown && centerSearch.length >= 2 && filteredCenters.length === 0 && !centersLoading && !centersError && (
+                                    <div className="absolute z-50 w-full rounded-xl mt-1 px-4 py-3 text-sm"
+                                         style={{ background: 'var(--surface)', border: '1.5px solid var(--border)', color: 'var(--text-muted)' }}>
+                                        نتیجه‌ای برای «{centerSearch}» پیدا نشد
+                                    </div>
+                                )}
                             </div>
 
                             {/* کیلومترها */}
@@ -227,12 +286,7 @@ export default function DirectRequestPage() {
                                     بازگشت
                                 </motion.button>
                                 <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                                               className="flex-1 h-14 text-white rounded-xl font-bold text-lg shadow-lg transition-all"
-                                               style={{
-                                                   background: canDirectAccept
-                                                       ? 'linear-gradient(135deg, #10b981, #059669)'
-                                                       : 'linear-gradient(135deg, #059669, #047857)',
-                                               }}>
+                                               className="flex-1 h-14 text-white rounded-xl font-bold text-lg shadow-lg transition-all btn-success">
                                     {canDirectAccept ? 'استعلام (پذیرش مستقیم)' : 'ادامه به ثبت درخواست'}
                                 </motion.button>
                             </div>

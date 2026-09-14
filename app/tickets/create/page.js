@@ -9,8 +9,10 @@ import {
     faPaperclip, faCheckCircle
 } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import DashboardLayout from '@/app/dashboard/Dashboardlayout'
 import Swal from 'sweetalert2'
+import { ENV, getHeaders } from '@/app/config/env'
 
 const TABS = [
     { id: 'info',    label: 'اطلاعات تیکت', icon: faTag       },
@@ -25,14 +27,9 @@ const PRIORITIES = [
     { value: 'high',   label: 'بالا',   color: 'var(--danger)',  bg: 'var(--danger-light)'   },
 ]
 
-// پیام‌های چت نمونه (نشان‌دهنده ظاهر)
-const PREVIEW_MESSAGES = [
-    { id: 1, sender: 'user',    text: 'سلام، با مشکلی در ثبت بارنامه مواجه شدم.',      time: 'همین الان' },
-    { id: 2, sender: 'support', text: 'سلام! ممنون از تماس شما. لطفاً جزئیات بیشتری بفرمایید تا بتوانیم سریع‌تر کمک کنیم.', time: 'در انتظار ارسال' },
-]
-
 export default function CreateTicketPage() {
-    const router = useRouter()
+    const router       = useRouter()
+    const queryClient  = useQueryClient()
     const [activeTab,  setActiveTab]  = useState('info')
     const [direction,  setDirection]  = useState(1)
     const [submitting, setSubmitting] = useState(false)
@@ -64,11 +61,55 @@ export default function CreateTicketPage() {
     const handleSubmit = async () => {
         if (!filledInfo)    { changeTab('info');    return Swal.fire({ icon: 'warning', title: 'اطلاعات ناقص', text: 'عنوان و دسته‌بندی را پر کنید' }) }
         if (!filledMessage) { changeTab('message'); return Swal.fire({ icon: 'warning', title: 'پیام خالی',    text: 'متن پیام را وارد کنید' }) }
+
+        // ⭐⭐ اگه فایل پیوست شده ولی بک‌اند برای آپلود فایل مسیر جدایی نداره
+        // (تو مستندات routes چیزی برای آپلود فایل دیده نشد)، فعلاً به کاربر هشدار می‌دیم
+        if (files.length > 0) {
+            const confirm = await Swal.fire({
+                icon: 'info',
+                title: 'توجه',
+                text: 'در حال حاضر امکان آپلود فایل پیوست پیاده‌سازی نشده و فایل‌های انتخابی ارسال نخواهند شد. ادامه می‌دهید؟',
+                showCancelButton: true,
+                confirmButtonText: 'بله، بدون پیوست ادامه بده',
+                cancelButtonText: 'انصراف',
+            })
+            if (!confirm.isConfirmed) return
+        }
+
         setSubmitting(true)
-        await new Promise(r => setTimeout(r, 1200))
-        setSubmitting(false)
-        await Swal.fire({ icon: 'success', title: 'تیکت ثبت شد!', text: 'تیم پشتیبانی در اسرع وقت پاسخ خواهد داد.', timer: 2500, showConfirmButton: false })
-        router.push('/tickets')
+        try {
+            // ⭐⭐ تغییر اصلی: قبلاً اینجا فقط یه setTimeout الکی بود و هیچ درخواستی
+            // به سرور نمی‌رفت! الان واقعاً POST به ENV.API_TICKETS می‌زنیم.
+            // ⭐ نکته: بک‌اند فیلد رو 'content' می‌خواد، نه 'message' — طبق مستندات routes
+            const res = await fetch(ENV.API_TICKETS, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({
+                    title:    form.title,
+                    content:  form.message,      // ⭐ map شدن message → content
+                    priority: form.priority,
+                    category: form.category || undefined,
+                }),
+            })
+            const result = await res.json().catch(() => ({}))
+
+            if (!res.ok) {
+                const msg =
+                    (result?.errors && typeof result.errors === 'object' && Object.values(result.errors)[0]?.[0]) ||
+                    (typeof result?.errors === 'string' ? result.errors : null) ||
+                    result?.message ||
+                    'ثبت تیکت ناموفق بود'
+                throw new Error(msg)
+            }
+
+            queryClient.invalidateQueries({ queryKey: ['tickets'] })
+            await Swal.fire({ icon: 'success', title: 'تیکت ثبت شد!', text: 'تیم پشتیبانی در اسرع وقت پاسخ خواهد داد.', timer: 2500, showConfirmButton: false })
+            router.push('/tickets')
+        } catch (err) {
+            Swal.fire({ icon: 'error', title: 'خطا', text: err.message || 'مشکلی رخ داد' })
+        } finally {
+            setSubmitting(false)
+        }
     }
 
     const tabVariants = {
@@ -151,6 +192,7 @@ export default function CreateTicketPage() {
                                                             <span style={{ color: 'var(--danger)' }}>* </span>عنوان تیکت
                                                         </label>
                                                         <input value={form.title} onChange={e => set('title')(e.target.value)}
+                                                               maxLength={50}
                                                                className="form-input" placeholder="موضوع تیکت را بنویسید..." />
                                                     </div>
 
@@ -198,7 +240,6 @@ export default function CreateTicketPage() {
                                                 <div className="space-y-4">
                                                     {/* پیش‌نمایش چت */}
                                                     <div className="rounded-xl p-4 space-y-3" style={{ background: 'var(--surface-2)', minHeight: '160px' }}>
-                                                        {/* پیام کاربر (پیش‌نمایش) */}
                                                         {form.message ? (
                                                             <div className="flex items-end gap-2 justify-end">
                                                                 <div className="max-w-xs px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm leading-relaxed"
@@ -216,7 +257,6 @@ export default function CreateTicketPage() {
                                                             </div>
                                                         )}
 
-                                                        {/* پیام پشتیبان (خودکار) */}
                                                         <div className="flex items-end gap-2">
                                                             <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
                                                                  style={{ background: 'var(--primary-light)' }}>
@@ -236,7 +276,6 @@ export default function CreateTicketPage() {
                                                         </div>
                                                     </div>
 
-                                                    {/* ورودی پیام */}
                                                     <div>
                                                         <label className="form-label">
                                                             <span style={{ color: 'var(--danger)' }}>* </span>متن پیام
@@ -254,7 +293,9 @@ export default function CreateTicketPage() {
                                             {/* ── تب پیوست ── */}
                                             {activeTab === 'attach' && (
                                                 <div className="space-y-4">
-                                                    {/* ناحیه آپلود */}
+                                                    <div className="rounded-xl p-3 text-xs" style={{ background: 'var(--warning-light)', color: 'var(--warning)' }}>
+                                                        ⚠️ آپلود فایل هنوز از سمت سرور پیاده‌سازی نشده — فایل‌های انتخابی فعلاً ارسال نمی‌شوند.
+                                                    </div>
                                                     <div className="rounded-2xl p-8 text-center cursor-pointer transition-all"
                                                          style={{ border: '2px dashed var(--border)', background: 'var(--surface-2)' }}
                                                          onClick={() => fileRef.current?.click()}
@@ -270,7 +311,6 @@ export default function CreateTicketPage() {
                                                         <input ref={fileRef} type="file" multiple className="hidden" onChange={handleFile} />
                                                     </div>
 
-                                                    {/* لیست فایل‌ها */}
                                                     {files.length > 0 && (
                                                         <div className="space-y-2">
                                                             {files.map((f, i) => (
@@ -335,7 +375,6 @@ export default function CreateTicketPage() {
                         {/* ── ستون کناری (راهنما) ── */}
                         <div className="lg:col-span-1 space-y-4">
 
-                            {/* خلاصه تیکت */}
                             <div className="card">
                                 <div className="card-header">
                                     <p className="card-title text-sm">خلاصه تیکت</p>
@@ -361,7 +400,6 @@ export default function CreateTicketPage() {
                                 </div>
                             </div>
 
-                            {/* راهنما */}
                             <div className="card">
                                 <div className="card-header">
                                     <div className="flex items-center gap-2">

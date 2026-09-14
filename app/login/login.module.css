@@ -3,6 +3,7 @@
     inset: 0;
     width: 100%;
     height: 100vh;
+    height: 100dvh; /* ⭐ اضافه شد: رو مرورگر موبایل با نوار آدرس، ارتفاع واقعی رو درست حساب می‌کنه */
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -46,14 +47,20 @@
     position: absolute;
     inset: 0;
     background-image: url("/Gemini_Generated_Image_qgjz1hqgjz1hqgjz.png");
-    background-size: 100% auto;
-    background-position: center top;
+    /* ⭐⭐ تغییر اصلی: از 100% auto به cover تغییر کرد.
+       "100% auto" باعث می‌شد رو صفحه‌های باریک و بلند (موبایل)، ارتفاع واقعی
+       عکس (که متناسب با نسبت ابعاد افقیِ خودِ عکسه) خیلی کمتر از ارتفاع صفحه بشه
+       و یه نوار تخت/تیره‌ی خالی بالای صفحه بمونه — دقیقاً همون چیزی که تو عکس دیدی.
+       "cover" تضمین می‌کنه عکس همیشه کل کادر رو پر می‌کنه (با کراپ لازم)،
+       مهم نیست نسبت ابعاد صفحه (موبایل باریک یا دسکتاپ عریض) چی باشه. */
+    background-size: cover;
+    background-position: center center;
     background-repeat: no-repeat;
-    animation: subtleZoom 10s forwards;
+    animation: subtleZoom 12s ease-in-out infinite alternate;
 }
 @keyframes subtleZoom {
-    0%   { transform: scale(1); background-position: top center;    }
-    100% { transform: scale(1); background-position: center center; }
+    0%   { transform: scale(1);    }
+    100% { transform: scale(1.08); }
 }
 .login-background::after {
     content: '';
@@ -81,6 +88,7 @@
     padding: 50px 45px;
     -webkit-backdrop-filter: blur(20px);
     border-radius: 24px;
+    box-sizing: border-box; /* ⭐ اضافه شد: تا padding داخل عرض حساب بشه، نه اضافه بر عرض */
 }
 
 /* ═══ Login Header ═══ */
@@ -92,18 +100,15 @@
 /* ═══ Form ═══ */
 .glass-form { width: 100%; }
 
-/* ⭐ form-input-group: فقط margin — position نداره تا error متن جابجایی ایجاد نکنه */
 .form-input-group {
     margin-bottom: 28px;
 }
 
-/* ⭐ input-wrapper: position:relative — آیکون نسبت به این وسط‌چین میشه */
 .input-wrapper {
     position: relative;
     width: 100%;
 }
 
-/* ⭐ آیکون: top:50% نسبت به input-wrapper (نه form-input-group) */
 .input-icon {
     position: absolute;
     left: 18px;
@@ -113,7 +118,6 @@
     z-index: 1;
     pointer-events: none;
     color: rgba(237, 237, 245, 0.55);
-    /* آیکون فقط به input-wrapper وابسته‌ست — error text پایین‌تر جدا هست */
 }
 
 .form-input-group input {
@@ -128,23 +132,22 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     outline: none;
     display: block;
+    box-sizing: border-box; /* ⭐ اضافه شد: همون دلیل بالا */
 }
 .form-input-group input::placeholder {     color: rgba(255,255,255,0.45);
- font-weight: 400; }
+    font-weight: 400; }
 
 .form-input-group input:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(84,76,207,0.25);
     background: rgba(255,255,255,0.12);}
 
-/* ⭐ حالت error — border قرمز روی input */
 .form-input-group input.has-error {
     border-color: #ef4444 !important;
     background: rgba(101, 101, 101, 0.06);
     box-shadow: 0 0 0 3px rgba(239,68,68,0.18);
 }
 
-/* ⭐ متن خطا — زیر input-wrapper، جدا از آیکون */
 .form-error {
     display: block;
     margin-top: 6px;
@@ -177,6 +180,7 @@
     position: relative;
     overflow: hidden;
     margin-top: 10px;
+    box-sizing: border-box;
 }
 .glass-submit-btn::before {
     content: '';
@@ -209,18 +213,76 @@
 .forgot-link a:hover { color: white; text-decoration: underline; }
 
 /* ═══ Footer ═══ */
-.login-footer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 5; }
+.login-footer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 5; text-align: center; width: 90%; }
 .login-footer p { color: rgba(255,255,255,0.8); font-size: 13px; text-shadow: 0 2px 6px rgba(0,0,0,0.3); font-weight: 500; }
 
-/* ═══ Responsive ═══ */
-@media (max-width: 640px) {
-    .login-glass-box { width: 92%; padding: 40px 30px; }
-    .login-header h2 { font-size: 19px; }
-    .form-input-group input { height: 50px; font-size: 14px; }
-    .glass-submit-btn { height: 50px; font-size: 16px; }
+/* ═══════════════════════════════════════════════════
+   📱 Responsive — تبلت / موبایل بزرگ (≤ 900px)
+   ⭐⭐ اینجا اصلی‌ترین فیکس‌هاست
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+    .login-wrapper {
+        /* ⭐⭐ تغییر اصلی ۱: قبلاً هیچ‌وقت این override نمی‌شد.
+           رو دسکتاپ باکس سمت راسته (چون عکس پس‌زمینه سمت چپ دیده میشه)،
+           ولی رو موبایل/تبلت باید کاملاً وسط‌چین بشه، وگرنه با اون
+           padding-right:15% ترکیب با min-width باکس، از صفحه بیرون می‌زد. */
+        justify-content: center;
+        padding-right: 0;
+        padding: 16px;
+        box-sizing: border-box;
+    }
 }
+
+/* ═══ Responsive — موبایل (≤ 640px) ═══ */
+@media (max-width: 640px) {
+    .login-glass-box {
+        width: 100%;
+        /* ⭐⭐ تغییر اصلی ۲: مهم‌ترین فیکس همینه.
+           قبلاً اینجا min-width: 380px از قانون اصلی همچنان فعال بود،
+           پس حتی با وجود width:92%(قبلی)، باکس مجبور بود حداقل ۳۸۰px
+           عرض داشته باشه — رو گوشی‌های زیر ۴۱۳px (اکثر گوشی‌ها!)
+           این یعنی باکس از عرض صفحه بزرگ‌تر می‌شد و می‌زد بیرون/می‌برید. */
+        min-width: 0;
+        max-width: 420px;
+        padding: 36px 24px;
+    }
+    .login-header { margin-bottom: 26px; }
+    .login-header h2 { font-size: 18px; }
+    .form-input-group { margin-bottom: 20px; }
+    .form-input-group input { height: 48px; font-size: 14px; padding: 0 18px 0 46px; }
+    .input-icon { left: 16px; font-size: 15px; }
+    .remember-row { margin: 16px 0; }
+    .glass-submit-btn { height: 48px; font-size: 15px; }
+    .forgot-link { margin-top: 16px; }
+    .login-footer { bottom: 12px; }
+    .login-footer p { font-size: 11px; }
+}
+
+/* ═══ Responsive — موبایل کوچیک (≤ 400px) ═══ */
 @media (max-width: 400px) {
-    .login-glass-box { padding: 35px 25px; }
+    .login-wrapper { padding: 10px; }
+    .login-glass-box {
+        min-width: 0; /* ⭐ اینجا هم لازم بود چون این بلاک قبلاً فقط padding رو کم می‌کرد */
+        padding: 28px 18px;
+        border-radius: 18px;
+    }
+    .login-header h2 { font-size: 16px; }
+    .form-input-group input { height: 46px; }
+    .glass-submit-btn { height: 46px; }
+}
+
+/* ═══ Responsive — ارتفاع کم (مثلاً چرخوندن گوشی افقی) ═══ */
+@media (max-height: 600px) {
+    .login-wrapper { align-items: flex-start; }
+    .login-glass-box {
+        margin-top: 12px;
+        padding-top: 24px;
+        padding-bottom: 24px;
+        max-height: 92dvh;
+        overflow-y: auto;
+    }
+    .login-header { margin-bottom: 16px; }
+    .login-footer { display: none; } /* رو صفحه‌ی کوتاه، فوتر رو مخفی کن تا با باکس تداخل نکنه */
 }
 
 /* ═══ Floating Particles ═══ */
@@ -237,3 +299,11 @@
 .login-wrapper::after  { bottom: 15%; right: 10%; animation: floatParticle2 25s ease-in-out infinite; }
 @keyframes floatParticle1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px,-30px); } }
 @keyframes floatParticle2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-25px,25px); } }
+
+/* ⭐ رو موبایل ذره‌های شناور رو کوچیک‌تر می‌کنیم که فضای زیادی اشغال نکنن */
+@media (max-width: 640px) {
+    .login-wrapper::before, .login-wrapper::after {
+        width: 160px;
+        height: 160px;
+    }
+}

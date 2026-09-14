@@ -1,234 +1,255 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faTicket, faArrowLeft, faPaperPlane, faHeadset,
-    faUser, faCircle, faClock, faTag, faFile, faPaperclip
+    faArrowLeft, faTicket, faPaperPlane, faSpinner, faHeadset,
+    faUser, faXmark, faCircle, faTag, faClock
 } from '@fortawesome/free-solid-svg-icons'
-import { useRouter, useParams } from 'next/navigation'
 import DashboardLayout from '@/app/dashboard/Dashboardlayout'
+import Swal from 'sweetalert2'
+import { ENV, getHeaders } from '@/app/config/env'
 
-const MOCK_TICKET = {
-    id: 1, title: 'خطا در ثبت بارنامه', category: 'فنی', priority: 'high',
-    status: 'in_progress', date: '۱۴۰۴/۱۱/۲۰',
-    messages: [
-        { id: 1, sender: 'user',    name: 'علی محمدی',    text: 'سلام، وقتی می‌خوام بارنامه جدید ثبت کنم با خطای ۵۰۰ مواجه میشم. این مشکل از دیروز شروع شده.',                                       time: '۱۴۰۴/۱۱/۲۰ - ۱۰:۲۳' },
-        { id: 2, sender: 'support', name: 'پشتیبانی ویرا', text: 'سلام علی عزیز، ممنون که با ما در تماس هستید. لطفاً اسکرین‌شات از خطا بفرستید و همچنین بگویید از کدام مرورگر استفاده می‌کنید.',  time: '۱۴۰۴/۱۱/۲۰ - ۱۱:۰۵' },
-        { id: 3, sender: 'user',    name: 'علی محمدی',    text: 'از Chrome نسخه ۱۲۰ استفاده می‌کنم. خطا اینه: "Failed to submit: Internal Server Error"',                                            time: '۱۴۰۴/۱۱/۲۰ - ۱۱:۳۰' },
-        { id: 4, sender: 'support', name: 'پشتیبانی ویرا', text: 'متشکرم. مشکل شناسایی شد و تیم فنی در حال بررسی است. ظرف ۲ ساعت آینده برطرف خواهد شد.',                                          time: '۱۴۰۴/۱۱/۲۰ - ۱۲:۱۵' },
-    ]
+const STATUS_LABEL = { open: 'باز', closed: 'بسته', pending: 'در انتظار' }
+const STATUS_STYLE = {
+    open:    { background: 'var(--success-light)', color: 'var(--success)' },
+    closed:  { background: 'var(--danger-light)',  color: 'var(--danger)'  },
+    pending: { background: 'var(--warning-light)', color: 'var(--warning)' },
+}
+const PRIORITY_LABEL = { low: 'پایین', medium: 'متوسط', high: 'بالا' }
+const PRIORITY_STYLE = {
+    low:    { background: 'var(--info-light)',    color: 'var(--info)'    },
+    medium: { background: 'var(--warning-light)', color: 'var(--warning)' },
+    high:   { background: 'var(--danger-light)',  color: 'var(--danger)'  },
 }
 
-const STATUS_MAP = {
-    open:        { label: 'باز',           cls: 'badge-info'    },
-    in_progress: { label: 'در حال بررسی', cls: 'badge-warning' },
-    closed:      { label: 'بسته شد',      cls: 'badge-muted'   },
-    answered:    { label: 'پاسخ داده شد', cls: 'badge-success' },
-}
-const PRIORITY_MAP = {
-    high:   { label: 'بالا',  color: 'var(--danger)'  },
-    medium: { label: 'متوسط', color: 'var(--warning)' },
-    low:    { label: 'پایین', color: 'var(--success)' },
-}
+export default function TicketDetailPage() {
+    const { id }       = useParams()
+    const router        = useRouter()
+    const queryClient   = useQueryClient()
+    const [replyText, setReplyText] = useState('')
 
-export default function TicketShowPage() {
-    const router = useRouter()
-    const { id } = useParams()
-    const [ticket,  setTicket]  = useState(MOCK_TICKET)
-    const [reply,   setReply]   = useState('')
-    const [sending, setSending] = useState(false)
-    const bottomRef = useRef(null)
+    const { data: ticket, isLoading, error } = useQuery({
+        queryKey: ['ticket', id],
+        queryFn: async () => {
+            const r   = await fetch(`${ENV.API_TICKETS}/${id}`, { headers: getHeaders() })
+            const res = await r.json().catch(() => ({}))
+            if (!r.ok) throw new Error(res?.message || `خطای ${r.status}`)
+            // ⭐ شکل دقیق پاسخ این endpoint تأیید نشده — چند حالت رایج رو پوشش می‌دیم
+            return res.data?.ticket ?? res.data ?? null
+        },
+        enabled: !!id,
+        retry: 1,
+    })
 
-    useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [ticket.messages])
+    // ⭐ لیست پاسخ‌ها — اسم فیلد دقیق تأیید نشده، چند احتمال رایج رو چک می‌کنیم
+    const replies = ticket?.replies ?? ticket?.messages ?? ticket?.ticket_replies ?? []
 
-    const sendReply = async () => {
-        if (!reply.trim()) return
-        setSending(true)
-        await new Promise(r => setTimeout(r, 600))
-        const newMsg = {
-            id:     ticket.messages.length + 1,
-            sender: 'user', name: 'علی محمدی',
-            text:   reply, time: 'همین الان'
-        }
-        setTicket(prev => ({ ...prev, messages: [...prev.messages, newMsg] }))
-        setReply('')
-        setSending(false)
+    const replyMutation = useMutation({
+        mutationFn: (content) =>
+            fetch(`${ENV.API_TICKETS}/${id}/reply`, {
+                method: 'POST', headers: getHeaders(), body: JSON.stringify({ content }),
+            }).then(async r => {
+                const res = await r.json().catch(() => ({}))
+                if (!r.ok) throw new Error(res?.message || 'ارسال پاسخ ناموفق بود')
+                return res
+            }),
+        onSuccess: () => {
+            setReplyText('')
+            queryClient.invalidateQueries({ queryKey: ['ticket', id] })
+        },
+        onError: (err) => Swal.fire('خطا!', err.message, 'error'),
+    })
+
+    const closeMutation = useMutation({
+        mutationFn: () => fetch(`${ENV.API_TICKETS}/${id}/close`, { method: 'POST', headers: getHeaders() })
+            .then(r => r.json()),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['ticket', id] })
+            queryClient.invalidateQueries({ queryKey: ['tickets'] })
+            Swal.fire({ title: 'بسته شد!', icon: 'success', timer: 1800, showConfirmButton: false })
+        },
+        onError: () => Swal.fire('خطا!', 'عملیات انجام نشد', 'error'),
+    })
+
+    const handleSendReply = () => {
+        if (replyText.trim().length === 0) return
+        replyMutation.mutate(replyText.trim())
     }
 
-    const st = STATUS_MAP[ticket.status]   || STATUS_MAP.open
-    const pr = PRIORITY_MAP[ticket.priority] || PRIORITY_MAP.medium
+    if (isLoading) {
+        return (
+            <DashboardLayout>
+                <div className="w-full min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
+                    <FontAwesomeIcon icon={faSpinner} className="w-8 h-8 animate-spin" style={{ color: 'var(--primary)' }} />
+                </div>
+            </DashboardLayout>
+        )
+    }
+
+    if (error || !ticket) {
+        return (
+            <DashboardLayout>
+                <div className="w-full min-h-screen flex flex-col items-center justify-center gap-3" style={{ background: 'var(--bg)' }}>
+                    <p style={{ color: 'var(--danger)' }}>{error?.message || 'تیکت پیدا نشد'}</p>
+                    <button onClick={() => router.push('/tickets')} className="btn btn-back btn-sm">بازگشت به لیست</button>
+                </div>
+            </DashboardLayout>
+        )
+    }
 
     return (
         <DashboardLayout>
             <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
 
-                {/* هدر */}
                 <div className="page-header-bar">
-                    <div className="max-w-5xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                    <div className="max-w-4xl mx-auto flex items-center justify-between">
+                        <div className="flex items-center gap-3 min-w-0">
                             <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                                  style={{ background: 'rgba(255,255,255,0.2)' }}>
                                 <FontAwesomeIcon icon={faTicket} className="w-5 h-5 text-white" />
                             </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white leading-none">{ticket.title}</h1>
-                                <div className="flex items-center gap-2 mt-1">
-                                    <span className={`badge ${st.cls}`} style={{ fontSize: '10px', padding: '2px 8px' }}>{st.label}</span>
-                                    <span className="text-xs font-bold" style={{ color: pr.color }}>
-                                        <FontAwesomeIcon icon={faCircle} className="w-2 h-2 ml-1" />
-                                        اولویت {pr.label}
-                                    </span>
-                                </div>
+                            <div className="min-w-0">
+                                <h1 className="text-xl font-black text-white leading-none truncate">{ticket.title}</h1>
+                                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>تیکت #{ticket.id}</p>
                             </div>
                         </div>
-                        <button onClick={() => router.back()} className="btn btn-back btn-sm">
-                            <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" />
-                            بازگشت
+                        <button onClick={() => router.push('/tickets')} className="btn btn-back btn-sm flex-shrink-0">
+                            <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" />بازگشت
                         </button>
                     </div>
                 </div>
 
-                <div className="page-content max-w-5xl">
+                <div className="page-content max-w-4xl">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                        {/* ── چت ── */}
-                        <div className="lg:col-span-2 flex flex-col gap-4">
+                        {/* ── ستون اصلی: گفتگو ── */}
+                        <div className="lg:col-span-2">
+                            <div className="card flex flex-col" style={{ height: '560px' }}>
 
-                            {/* پنجره پیام‌ها */}
-                            <div className="card flex flex-col" style={{ minHeight: '480px' }}>
-                                {/* هدر چت */}
-                                <div className="card-header">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                                             style={{ background: 'var(--primary-light)' }}>
-                                            <FontAwesomeIcon icon={faHeadset} className="w-4 h-4" style={{ color: 'var(--primary)' }} />
+                                {/* پیام اول (خود تیکت) + پاسخ‌ها */}
+                                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                                    {/* پیام اصلی تیکت */}
+                                    <div className="flex items-end gap-2 justify-end">
+                                        <div className="max-w-md px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm leading-relaxed"
+                                             style={{ background: 'var(--primary)', color: '#fff' }}>
+                                            {ticket.content}
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>گفتگوی تیکت #{id}</p>
-                                            <div className="flex items-center gap-1.5">
-                                                <span className="w-2 h-2 rounded-full" style={{ background: 'var(--success)' }} />
-                                                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>پشتیبانی آنلاین</p>
-                                            </div>
+                                        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-black text-xs text-white"
+                                             style={{ background: 'var(--primary-hover)' }}>
+                                            <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                                         </div>
                                     </div>
-                                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{ticket.messages.length} پیام</span>
-                                </div>
 
-                                {/* بدنه پیام‌ها */}
-                                <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ background: 'var(--surface-2)', maxHeight: '380px' }}>
-                                    {ticket.messages.map((msg, i) => {
-                                        const isUser = msg.sender === 'user'
-                                        return (
-                                            <motion.div key={msg.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                                                        className={`flex items-end gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
-                                                {!isUser && (
-                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                                                         style={{ background: 'var(--primary-light)' }}>
-                                                        <FontAwesomeIcon icon={faHeadset} className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
+                                    {/* تاریخ پیام اصلی */}
+                                    <p className="text-center text-xs" style={{ color: 'var(--text-muted)' }}>
+                                        {ticket.created_at && new Date(ticket.created_at).toLocaleString('fa-IR')}
+                                    </p>
+
+                                    {/* پاسخ‌ها */}
+                                    {replies.length === 0 ? (
+                                        <p className="text-center text-xs py-6" style={{ color: 'var(--text-muted)' }}>
+                                            هنوز پاسخی ثبت نشده
+                                        </p>
+                                    ) : (
+                                        replies.map((reply, i) => {
+                                            const isSupport = reply.is_support || reply.sender === 'support' || reply.user_type === 'admin'
+                                            return (
+                                                <div key={reply.id ?? i}
+                                                     className={`flex items-end gap-2 ${isSupport ? '' : 'justify-end'}`}>
+                                                    {isSupport && (
+                                                        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                                                             style={{ background: 'var(--primary-light)' }}>
+                                                            <FontAwesomeIcon icon={faHeadset} className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
+                                                        </div>
+                                                    )}
+                                                    <div className={`max-w-md px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${isSupport ? 'rounded-br-sm' : 'rounded-bl-sm'}`}
+                                                         style={isSupport
+                                                             ? { background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }
+                                                             : { background: 'var(--primary)', color: '#fff' }}>
+                                                        {reply.content}
                                                     </div>
-                                                )}
-                                                <div className={`max-w-sm ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-                                                    <p className="text-xs font-bold px-1" style={{ color: 'var(--text-muted)' }}>{msg.name}</p>
-                                                    <div className="px-4 py-2.5 text-sm leading-relaxed"
-                                                         style={{
-                                                             background:   isUser ? 'var(--primary)' : 'var(--surface)',
-                                                             color:        isUser ? '#fff' : 'var(--text)',
-                                                             borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                                                             border:       isUser ? 'none' : '1px solid var(--border)',
-                                                             boxShadow:    'var(--shadow-sm)',
-                                                         }}>
-                                                        {msg.text}
-                                                    </div>
-                                                    <p className="text-[10px] px-1" style={{ color: 'var(--text-muted)' }}>
-                                                        <FontAwesomeIcon icon={faClock} className="w-2.5 h-2.5 ml-1" />
-                                                        {msg.time}
-                                                    </p>
+                                                    {!isSupport && (
+                                                        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-black text-xs text-white"
+                                                             style={{ background: 'var(--primary-hover)' }}>
+                                                            <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                {isUser && (
-                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-black text-sm text-white flex-shrink-0"
-                                                         style={{ background: 'var(--primary-hover)' }}>ع</div>
-                                                )}
-                                            </motion.div>
-                                        )
-                                    })}
-                                    <div ref={bottomRef} />
+                                            )
+                                        })
+                                    )}
                                 </div>
 
-                                {/* ورودی ریپلای */}
-                                <div className="card-footer">
-                                    <div className="flex gap-3 items-end">
-                                        <textarea value={reply} onChange={e => setReply(e.target.value)}
-                                                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply() } }}
-                                                  rows={2} placeholder="پیام خود را بنویسید... (Enter برای ارسال)"
-                                                  className="form-textarea flex-1" style={{ minHeight: 'unset', resize: 'none', padding: '10px 12px' }} />
-                                        <button onClick={sendReply} disabled={!reply.trim() || sending}
-                                                className="btn btn-primary btn-sm flex-shrink-0" style={{ height: '48px', width: '48px', padding: 0, borderRadius: '12px' }}>
-                                            <FontAwesomeIcon icon={faPaperPlane} className={`w-4 h-4 ${sending ? 'animate-pulse' : ''}`} />
+                                {/* باکس پاسخ */}
+                                {ticket.status !== 'closed' ? (
+                                    <div className="p-3 flex items-center gap-2" style={{ borderTop: '1px solid var(--border)' }}>
+                                        <input
+                                            value={replyText}
+                                            onChange={e => setReplyText(e.target.value)}
+                                            onKeyDown={e => { if (e.key === 'Enter' && !replyMutation.isPending) handleSendReply() }}
+                                            placeholder="پاسخ خود را بنویسید..."
+                                            className="form-input flex-1"
+                                        />
+                                        <button onClick={handleSendReply} disabled={replyMutation.isPending || !replyText.trim()}
+                                                className="btn btn-primary flex-shrink-0">
+                                            <FontAwesomeIcon icon={replyMutation.isPending ? faSpinner : faPaperPlane}
+                                                             className={`w-4 h-4 ${replyMutation.isPending ? 'animate-spin' : ''}`} />
                                         </button>
                                     </div>
-                                </div>
+                                ) : (
+                                    <div className="p-3 text-center text-xs" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                                        این تیکت بسته شده و امکان پاسخ‌دهی وجود ندارد
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        {/* ── ستون کناری ── */}
+                        {/* ── ستون کناری: اطلاعات ── */}
                         <div className="lg:col-span-1 space-y-4">
                             <div className="card">
-                                <div className="card-header">
-                                    <p className="card-title text-sm">اطلاعات تیکت</p>
-                                </div>
+                                <div className="card-header"><p className="card-title text-sm">اطلاعات تیکت</p></div>
                                 <div className="card-body space-y-3">
-                                    {[
-                                        { label: 'شماره',      value: `#${ticket.id}`,    icon: faTag      },
-                                        { label: 'دسته‌بندی', value: ticket.category,      icon: faTicket   },
-                                        { label: 'تاریخ',      value: ticket.date,          icon: faClock    },
-                                        { label: 'وضعیت',      value: st.label,             icon: faCircle   },
-                                    ].map(({ label, value, icon }) => (
-                                        <div key={label} className="flex items-center gap-2.5 p-2.5 rounded-xl"
-                                             style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
-                                            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                                                 style={{ background: 'var(--primary-light)' }}>
-                                                <FontAwesomeIcon icon={icon} className="w-3 h-3" style={{ color: 'var(--primary)' }} />
-                                            </div>
-                                            <div>
-                                                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</p>
-                                                <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>{value}</p>
-                                            </div>
-                                        </div>
-                                    ))}
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>وضعیت</span>
+                                        <span className="badge" style={STATUS_STYLE[ticket.status] ?? {}}>
+                                            {STATUS_LABEL[ticket.status] ?? ticket.status}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>اولویت</span>
+                                        <span className="badge" style={PRIORITY_STYLE[ticket.priority] ?? {}}>
+                                            {PRIORITY_LABEL[ticket.priority] ?? ticket.priority}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>دسته‌بندی</span>
+                                        <span className="badge badge-muted">{ticket.category || '—'}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>تاریخ ثبت</span>
+                                        <span className="text-xs font-semibold" style={{ color: 'var(--text)' }}>
+                                            {ticket.created_at && new Date(ticket.created_at).toLocaleDateString('fa-IR')}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="card">
-                                <div className="card-header">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                                             style={{ background: 'var(--success-light)' }}>
-                                            <FontAwesomeIcon icon={faHeadset} className="w-3.5 h-3.5" style={{ color: 'var(--success)' }} />
-                                        </div>
-                                        <p className="card-title text-sm">پشتیبانی</p>
-                                    </div>
-                                </div>
-                                <div className="card-body">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                             style={{ background: 'var(--primary-light)' }}>
-                                            <FontAwesomeIcon icon={faHeadset} className="w-4 h-4" style={{ color: 'var(--primary)' }} />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>تیم پشتیبانی ویرا</p>
-                                            <div className="flex items-center gap-1.5 mt-0.5">
-                                                <span className="w-2 h-2 rounded-full" style={{ background: 'var(--success)' }} />
-                                                <p className="text-xs" style={{ color: 'var(--success)' }}>آنلاین</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p className="text-xs mt-3 p-2.5 rounded-xl" style={{ color: 'var(--text-muted)', background: 'var(--surface-2)' }}>
-                                        ⏱ میانگین پاسخ: ۲–۴ ساعت کاری
-                                    </p>
-                                </div>
-                            </div>
+                            {ticket.status !== 'closed' && (
+                                <button onClick={() => Swal.fire({
+                                    title: 'بستن تیکت؟', icon: 'question', showCancelButton: true,
+                                    confirmButtonColor: 'var(--danger)', confirmButtonText: 'بله، ببند', cancelButtonText: 'انصراف',
+                                }).then(r => r.isConfirmed && closeMutation.mutate())}
+                                        disabled={closeMutation.isPending}
+                                        className="btn btn-danger w-full">
+                                    <FontAwesomeIcon icon={closeMutation.isPending ? faSpinner : faXmark}
+                                                     className={`w-4 h-4 ${closeMutation.isPending ? 'animate-spin' : ''}`} />
+                                    بستن تیکت
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

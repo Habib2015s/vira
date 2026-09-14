@@ -182,8 +182,13 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                 )}
             </AnimatePresence>
 
+            {/* ⭐⭐ تغییر اصلی: قبلاً این aside همیشه رو صفحه بود (فقط عرضش بین ۸۰ و ۲۶۰ عوض می‌شد)
+                و رو موبایل هیچ‌وقت واقعاً "مخفی" نمی‌شد - یه نوار ۸۰ پیکسلی همیشه جا اشغال می‌کرد.
+                الان با translate-x-full وقتی isOpen=false هست، کامل از صفحه (سمت راست) بیرون میره،
+                و با lg:translate-x-0 رو دسکتاپ (breakpoint lg به بالا) همیشه سرجاش می‌مونه -
+                دقیقاً همون رفتار collapse/expand قبلی که می‌خواستیم. */}
             <motion.aside animate={{ width: isOpen ? 260 : 80 }} transition={{ duration: 0.28, ease: 'easeInOut' }}
-                          className="fixed right-0 top-0 h-screen flex flex-col z-40 overflow-hidden"
+                          className={`fixed right-0 top-0 h-screen flex flex-col z-40 overflow-hidden transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
                           style={{ background: 'var(--surface)', borderLeft: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
 
                 {/* Logo */}
