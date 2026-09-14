@@ -16,17 +16,17 @@ const makeSelectStyles = () => ({
         '&:hover': { borderColor: 'var(--border-strong)' },
         flexWrap: 'nowrap', cursor: 'pointer',
     }),
-    valueContainer: (base) => ({ ...base, padding: '0 6px', flexWrap: 'nowrap' }),
-    placeholder:    (base) => ({ ...base, fontSize: '11px', color: 'var(--muted)', whiteSpace: 'nowrap' }),
-    singleValue:    (base) => ({ ...base, fontSize: '11px', color: 'var(--text)', fontWeight: '600' }),
-    input:          (base) => ({ ...base, fontSize: '11px', color: 'var(--text)', margin: 0, padding: 0 }),
+    valueContainer: (base) => ({ ...base, padding: '0 8px', flexWrap: 'nowrap' }),
+    placeholder:    (base) => ({ ...base, fontSize: '12px', color: 'var(--muted)', whiteSpace: 'nowrap' }),
+    singleValue:    (base) => ({ ...base, fontSize: '12px', color: 'var(--text)', fontWeight: '600' }),
+    input:          (base) => ({ ...base, fontSize: '12px', color: 'var(--text)', margin: 0, padding: 0 }),
     menu:           (base) => ({ ...base, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-md)', zIndex: 9999 }),
     menuList:       (base) => ({ ...base, padding: '4px', background: 'var(--surface)' }),
     option: (base, state) => ({
         ...base,
         background: state.isSelected ? 'var(--primary)' : state.isFocused ? 'var(--surface-2)' : 'transparent',
         color: state.isSelected ? '#fff' : 'var(--text)',
-        fontSize: '11px', fontWeight: state.isSelected ? '700' : '500',
+        fontSize: '12px', fontWeight: state.isSelected ? '700' : '500',
         borderRadius: '6px', margin: '2px 0', cursor: 'pointer',
     }),
     indicatorSeparator: () => ({ display: 'none' }),
@@ -58,10 +58,10 @@ function SearchInput({ colKey, colLabel, committedValue, onCommit }) {
     const canApply  = draft.trim().length >= 2 && draft.trim() !== committedValue
 
     return (
-        <div className="flex items-center gap-1">
-            <div className="relative flex-1">
+        <div className="flex items-center gap-1.5">
+            <div className="relative flex-1" style={{ minWidth: 0 }}>
                 <FontAwesomeIcon icon={faMagnifyingGlass}
-                                 className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none"
+                                 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none"
                                  style={{ color: isApplied ? 'var(--primary)' : 'var(--muted)' }} />
                 <input type="text" value={draft}
                        placeholder={`حداقل دو کاراکتر وارد کنید...`}
@@ -69,8 +69,8 @@ function SearchInput({ colKey, colLabel, committedValue, onCommit }) {
                        onKeyDown={e => { if (e.key === 'Enter') commit() }}
                        style={{
                            width: '100%', height: '32px',
-                           paddingRight: '22px', paddingLeft: '6px',
-                           fontSize: '11px', borderRadius: '8px', outline: 'none',
+                           paddingRight: '26px', paddingLeft: '8px',
+                           fontSize: '12px', borderRadius: '8px', outline: 'none',
                            background: 'var(--surface)', color: 'var(--text)',
                            border: `1.5px solid ${isApplied ? 'var(--primary)' : 'var(--border)'}`,
                            boxShadow: isApplied ? '0 0 0 3px rgba(84,76,207,0.12)' : 'none',
@@ -120,7 +120,7 @@ function SelectInput({ colKey, colLabel, placeholder, options, committedValue, o
     const clear  = () => { setDraft(null); onCommit(colKey, null) }
 
     return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
             <div className="flex-1" style={{ minWidth: 0 }}>
                 <Select
                     instanceId={`sel-${colKey}`}
@@ -366,12 +366,12 @@ export default function DataTable({
                     </div>
                 )}
                 <div className="flex-1 hidden sm:block" />
-                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                     <ActiveFiltersPopup filters={filters} searches={searches} columns={columns}
                                         onClearOne={clearOneFilter} onClearAll={clearAllFilters} />
 
                     <button onClick={() => setFiltersOpen(v => !v)}
-                            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex-shrink-0"
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold flex-shrink-0"
                             style={{
                                 background: filtersOpen ? 'var(--primary-light)' : 'var(--surface)',
                                 color: filtersOpen ? 'var(--primary)' : 'var(--text-soft)',
@@ -382,7 +382,7 @@ export default function DataTable({
                     </button>
 
                     <button onClick={exportCsv}
-                            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex-shrink-0"
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold flex-shrink-0"
                             style={{ background: 'var(--surface)', color: 'var(--text-soft)', border: '1.5px solid var(--border)' }}
                             onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text)' }}
                             onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.color = 'var(--text-soft)' }}>
@@ -394,7 +394,7 @@ export default function DataTable({
                         {hasActiveFilters && (
                             <motion.button initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }}
                                            onClick={clearAllFilters}
-                                           className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex-shrink-0"
+                                           className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold flex-shrink-0"
                                            style={{ background: 'var(--danger-light)', color: 'var(--danger)' }}>
                                 <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />پاک کردن همه
                             </motion.button>
@@ -421,16 +421,16 @@ export default function DataTable({
                 </div>
             </div>
 
-            {/* جدول */}
-            <div className="overflow-x-auto">
+            {/* جدول — روی موبایل که ستون‌ها جا نمیشن، به‌جای فشرده‌شدن، افقی اسکرول میشه */}
+            <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
                 <table className="w-full" style={{ borderCollapse: 'collapse' }}>
                     <thead>
                     {/* ردیف فیلترها */}
                     {filtersOpen && (
                         <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
                             {columns.map((col, i) => (
-                                <th key={i} className="px-1.5 sm:px-2 py-1.5 sm:py-2"
-                                    style={{ borderLeft: i < columns.length - 1 ? '1px solid var(--border)' : 'none', minWidth: '80px' }}>
+                                <th key={i} className="px-2 py-2"
+                                    style={{ borderLeft: i < columns.length - 1 ? '1px solid var(--border)' : 'none', minWidth: '128px' }}>
                                     {col.filter?.type === 'select' ? (
                                         /* ⭐ select هم با تیک تایید */
                                         <SelectInput
@@ -457,7 +457,7 @@ export default function DataTable({
                     {/* هدر ستون‌ها */}
                     <tr style={{ background: 'var(--surface-2)' }}>
                         {columns.map((col, i) => (
-                            <th key={i} className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold"
+                            <th key={i} className="px-3 py-2.5 text-center text-xs sm:text-sm font-bold"
                                 style={{ color: 'var(--text)', borderBottom: '1.5px solid var(--border)', borderLeft: i < columns.length - 1 ? '1px solid var(--border)' : 'none', whiteSpace: 'nowrap' }}>
                                 {col.label}
                             </th>
