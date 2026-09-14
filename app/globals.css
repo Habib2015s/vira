@@ -14,15 +14,15 @@
     --primary-subtle: #f4f4f5;
     --primary-dark:   #09090b;
 
-    /* ── وضعیت‌ها (فقط برای شاخص‌های آماری/چارت نگه داشته شده) ── */
+    /* ── وضعیت‌ها/عملیات (دکمه‌های عملیاتی، بج‌ها، چارت‌ها رنگی می‌مونن) ── */
     --success:        #16a34a;
     --success-light:  #dcfce7;
     --warning:        #d97706;
     --warning-light:  #fef3c7;
     --danger:         #dc2626;
     --danger-light:   #fee2e2;
-    --info:           #52525b;
-    --info-light:     #f4f4f5;
+    --info:           #0284c7;
+    --info-light:     #e0f2fe;
 
     --bg:             #f4f4f5;
     --surface:        #ffffff;
@@ -71,8 +71,8 @@
     --warning-light:  #1c1200;
     --danger:         #f87171;
     --danger-light:   #2d0a0a;
-    --info:           #a1a1aa;
-    --info-light:     #27272a;
+    --info:           #38bdf8;
+    --info-light:     #082030;
 
     --bg:             #0a0a0b;
     --surface:        #131316;
@@ -99,8 +99,8 @@
 
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --primary: #7c72e0; --primary-hover: #6d62d4; --primary-light: #1e1b4b;
-        --primary-subtle: #1a1740; --primary-dark: #a5b4fc;
+        --primary: #e4e4e7; --primary-hover: #ffffff; --primary-light: #27272a;
+        --primary-subtle: #1f1f22; --primary-dark: #f4f4f5;
         --success: #34d399; --success-light: #052e16;
         --warning: #fbbf24; --warning-light: #1c1200;
         --danger: #f87171;  --danger-light: #2d0a0a;
@@ -184,19 +184,19 @@ body {
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
-/* ══════ دسته‌بندی رنگ دکمه‌ها ══════
-   سبز  (btn-success)                → ثبت / ذخیره / ایجاد / تایید
-   قرمز (btn-danger)                 → حذف
-   زرد  (btn-warning, btn-back, btn-ghost) → ویرایش / انصراف / بازگشت
-   مشکی (btn-primary)                → اکشن‌های خنثی/عمومی
-   خاکستری (btn-secondary)           → اکشن‌های ثانویه
-   ═══════════════════════════════════ */
+/* ══════ دسته‌بندی رنگ دکمه‌ها (عرف پروژه) ══════
+   سبز  (btn-primary, btn-success)   → افزودن / ثبت / ذخیره / ایجاد / تایید
+   قرمز (btn-danger, btn-ghost)      → حذف / انصراف / لغو
+   زرد  (btn-warning, btn-back)      → ویرایش / بازگشت
+   آبی  (action-btn-view, badge-info)→ مشاهده / اطلاعات
+   خاکستری (btn-secondary)           → اکشن‌های ثانویه/خنثی
+   نکته: --primary (خاکستری/مشکی) عمداً اینجا استفاده نمیشه — چون همون
+   متغیر پشت آیکون‌ها، حالت فعال منو و breadcrumb هم هست و باید مونوکروم
+   بمونه؛ رنگ سبز btn-primary مستقل و ثابت (hardcode) تعریف شده. */
 
-.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 1px 3px rgba(24,24,27,0.3); }
-.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); box-shadow: 0 4px 12px rgba(24,24,27,0.35); transform: translateY(-1px); }
+.btn-primary { background: #16a34a; color: #fff; border-color: #16a34a; box-shadow: 0 1px 3px rgba(22,163,74,0.25); }
+.btn-primary:hover { background: #15803d; border-color: #15803d; box-shadow: 0 4px 12px rgba(22,163,74,0.35); transform: translateY(-1px); }
 .btn-primary:active { transform: translateY(0); }
-.dark .btn-primary, [data-theme="dark"] .btn-primary { box-shadow: 0 1px 3px rgba(228,228,231,0.15); color: #000; }
-.dark .btn-primary:hover, [data-theme="dark"] .btn-primary:hover { box-shadow: 0 4px 12px rgba(228,228,231,0.25); color: #000; }
 
 /* ─── سبز: ثبت / ذخیره / ایجاد ─── */
 .btn-success { background: #16a34a; color: #fff; border-color: #16a34a; box-shadow: 0 1px 3px rgba(22,163,74,0.25); }
@@ -218,9 +218,11 @@ body {
 .btn-back { background: #f59e0b; color: #1c1200; border-color: #f59e0b; }
 .btn-back:hover { background: #d97706; box-shadow: 0 4px 12px rgba(245,158,11,0.4); transform: translateY(-1px); cursor: pointer; }
 
-/* ─── زرد (outline): انصراف ─── */
-.btn-ghost { color: #92400e; background: #fef3c7; border-color: #fcd34d; }
-.btn-ghost:hover { background: #fde68a; border-color: #f59e0b; box-shadow: 0 4px 12px rgba(245,158,11,0.25); transform: translateY(-1px); cursor: pointer; }
+/* ─── قرمز (outline): انصراف / لغو ─── */
+.btn-ghost { color: #991b1b; background: #fee2e2; border-color: #fca5a5; }
+.btn-ghost:hover { background: #fecaca; border-color: #f87171; box-shadow: 0 4px 12px rgba(220,38,38,0.25); transform: translateY(-1px); cursor: pointer; }
+.dark .btn-ghost, [data-theme="dark"] .btn-ghost { color: #fca5a5; background: #2d0a0a; border-color: #5c1a1a; }
+.dark .btn-ghost:hover, [data-theme="dark"] .btn-ghost:hover { background: #4a1414; border-color: #f87171; }
 
 .btn-sm { height: 32px; padding: 0 12px; font-size: 12.5px; border-radius: var(--radius-sm); }
 .btn-lg { height: 46px; padding: 0 24px; font-size: 15px; border-radius: var(--radius-md); }
@@ -264,7 +266,7 @@ body {
 }
 .dark .form-input:focus, .dark .form-select:focus, .dark .form-textarea:focus,
 [data-theme="dark"] .form-input:focus, [data-theme="dark"] .form-select:focus, [data-theme="dark"] .form-textarea:focus {
-    box-shadow: 0 0 0 3px rgba(124,114,224,0.2);
+    box-shadow: 0 0 0 3px rgba(228,228,231,0.15);
 }
 .form-input.error, .form-select.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(220,38,38,0.1); }
 .form-textarea { height: auto; padding: 10px 12px; resize: vertical; min-height: 80px; line-height: 1.6; }
@@ -465,7 +467,7 @@ body {
 }
 .dark .swal2-timer-progress-bar,
 [data-theme="dark"] .swal2-timer-progress-bar {
-    background: rgba(124,114,224,0.7) !important;
+    background: rgba(228,228,231,0.6) !important;
 }
 
 /* آیکون success دارک */
@@ -505,12 +507,12 @@ body {
     color: #fbbf24 !important;
 }
 
-/* آیکون question دارک */
+/* آیکون question دارک — مونوکروم (خاکستری)، نه بنفش */
 .dark .swal2-icon.swal2-question,
 [data-theme="dark"] .swal2-icon.swal2-question {
-    border-color: #7c72e0 !important;
-    color: #7c72e0 !important;
-    background: #1e1b4b !important;
+    border-color: #a1a1aa !important;
+    color: #e4e4e7 !important;
+    background: #27272a !important;
 }
 
 /* آیکون info دارک */
@@ -537,6 +539,6 @@ body {
 }
 .dark .swal2-input:focus,
 [data-theme="dark"] .swal2-input:focus {
-    border-color: #7c72e0 !important;
-    box-shadow: 0 0 0 3px rgba(124,114,224,0.2) !important;
+    border-color: #e4e4e7 !important;
+    box-shadow: 0 0 0 3px rgba(228,228,231,0.15) !important;
 }
