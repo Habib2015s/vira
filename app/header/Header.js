@@ -59,9 +59,8 @@ export default function Header() {
 
     return (
         <header
-            className="h-14 flex items-center sticky top-0 z-30"
+            className="h-14 flex items-center sticky top-0 z-30 pl-4 pr-16 lg:pr-4"
             style={{
-                padding: '0 16px',
                 background: 'var(--surface)',
                 borderBottom: '1px solid var(--border)',
             }}

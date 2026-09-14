@@ -182,8 +182,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                 )}
             </AnimatePresence>
 
+            {/* روی موبایل وقتی بسته‌ست کاملاً مخفیه (کشو) — روی lg به بالا همیشه به‌صورت نوار (باز/جمع) نمایش داده میشه */}
             <motion.aside animate={{ width: isOpen ? 260 : 80 }} transition={{ duration: 0.28, ease: 'easeInOut' }}
-                          className="fixed right-0 top-0 h-screen flex flex-col z-40 overflow-hidden"
+                          className={`fixed right-0 top-0 h-screen flex-col z-40 overflow-hidden ${isOpen ? 'flex' : 'hidden lg:flex'}`}
                           style={{ background: 'var(--surface)', borderLeft: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
 
                 {/* Logo */}
