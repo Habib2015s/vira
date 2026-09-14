@@ -421,8 +421,8 @@ export default function DataTable({
                 </div>
             </div>
 
-            {/* جدول */}
-            <div className="overflow-x-auto">
+            {/* جدول — روی موبایل که ستون‌ها جا نمیشن، به‌جای فشرده‌شدن، افقی اسکرول میشه */}
+            <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
                 <table className="w-full" style={{ borderCollapse: 'collapse' }}>
                     <thead>
                     {/* ردیف فیلترها */}

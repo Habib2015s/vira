@@ -18,9 +18,11 @@ export default function DashboardLayout({ children }) {
             <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
             {/* Main Content — فاصله برای سایدبار فقط از lg به بالا رزرو میشه؛ زیر آن سایدبار به‌صورت کشوی روی محتوا نمایش داده میشه */}
+            {/* min-w-0 لازمه وگرنه این آیتم فلکس به‌خاطر محتوای عریض‌تر (مثل جدول) کل صفحه رو عریض‌تر از موبایل می‌کنه
+                و به‌جای اسکرول‌شدن جدول، محتوا توسط overflow-x:hidden سراسری body بریده و مخفی می‌شه */}
             <div
                 className={`
-                    flex-1 min-h-screen transition-all duration-300
+                    flex-1 min-w-0 min-h-screen transition-all duration-300
                     ${isSidebarOpen ? 'lg:mr-64' : 'lg:mr-20'}
                 `}
             >
