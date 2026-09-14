@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faArrowLeft, faSpinner, faCheckCircle, faForward, faFileLines } from '@fortawesome/free-solid-svg-icons'
-import DashboardLayout from "@/app/dashboard/Dashboardlayout"
 import WaybillTabs from "@/app/components/shared/Waybilltabs"
 import DataDisplayList from '@/app/components/shared/DataDisplayList'
 import DynamicField from '@/app/components/shared/DynamicField'
@@ -176,20 +175,17 @@ export default function UniversalWaybillForm({ waybillType, mode = 'create', way
 
     // ── Loading ──────────────────────────────────────────
     if (loading) return (
-        <DashboardLayout>
-            <div className="w-full min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card text-center p-12">
-                    <FontAwesomeIcon icon={faSpinner} className="w-14 h-14 animate-spin mb-5" style={{ color: 'var(--primary)' }} />
-                    <p className="text-xl font-black mb-1" style={{ color: 'var(--text)' }}>در حال بارگذاری...</p>
-                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>بارنامه #{waybillId}</p>
-                </motion.div>
-            </div>
-        </DashboardLayout>
+        <div className="w-full min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card text-center p-12">
+                <FontAwesomeIcon icon={faSpinner} className="w-14 h-14 animate-spin mb-5" style={{ color: 'var(--primary)' }} />
+                <p className="text-xl font-black mb-1" style={{ color: 'var(--text)' }}>در حال بارگذاری...</p>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>بارنامه #{waybillId}</p>
+            </motion.div>
+        </div>
     )
 
     return (
-        <DashboardLayout>
-            <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
+        <div className="w-full min-h-screen" style={{ background: 'var(--bg)' }}>
 
                 {/* ── هدر ── */}
                 <div className="page-header-bar">
@@ -321,6 +317,5 @@ export default function UniversalWaybillForm({ waybillType, mode = 'create', way
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
     )
 }
