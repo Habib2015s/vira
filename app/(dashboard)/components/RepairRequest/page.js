@@ -135,7 +135,7 @@ export default function DirectRequestPage() {
                 {/* هدر */}
                 <div className="mx-10 px-8 rounded-t-lg py-6 shadow-xl"
                      style={{ background: 'var(--primary)', border: '1px solid var(--border)' }}>
-                    <h1 className="text-xl font-bold text-white">ثبت درخواست تعمیر</h1>
+                    <h1 className="text-xl font-bold" style={{ color: 'var(--surface)' }}>ثبت درخواست تعمیر</h1>
                 </div>
 
                 <div className="p-6 flex items-center justify-center min-h-[calc(100vh-200px)]">

@@ -129,11 +129,11 @@ export default function TicketDetailPage() {
                                     {/* پیام اصلی تیکت */}
                                     <div className="flex items-end gap-2 justify-end">
                                         <div className="max-w-md px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm leading-relaxed"
-                                             style={{ background: 'var(--primary)', color: '#fff' }}>
+                                             style={{ background: 'var(--primary)', color: 'var(--surface)' }}>
                                             {ticket.content}
                                         </div>
-                                        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-black text-xs text-white"
-                                             style={{ background: 'var(--primary-hover)' }}>
+                                        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-black text-xs"
+                                             style={{ background: 'var(--primary-hover)', color: 'var(--surface)' }}>
                                             <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                                         </div>
                                     </div>
@@ -163,12 +163,12 @@ export default function TicketDetailPage() {
                                                     <div className={`max-w-md px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${isSupport ? 'rounded-br-sm' : 'rounded-bl-sm'}`}
                                                          style={isSupport
                                                              ? { background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }
-                                                             : { background: 'var(--primary)', color: '#fff' }}>
+                                                             : { background: 'var(--primary)', color: 'var(--surface)' }}>
                                                         {reply.content}
                                                     </div>
                                                     {!isSupport && (
-                                                        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-black text-xs text-white"
-                                                             style={{ background: 'var(--primary-hover)' }}>
+                                                        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-black text-xs"
+                                                             style={{ background: 'var(--primary-hover)', color: 'var(--surface)' }}>
                                                             <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                                                         </div>
                                                     )}

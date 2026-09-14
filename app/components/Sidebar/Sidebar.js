@@ -106,8 +106,8 @@ function FlyoutMenu({ item, isActive, onNavigate }) {
                                 style={{ position: 'fixed', right: '88px', top: `${top}px`, zIndex: 9999, minWidth: '210px' }}>
                         <div className="rounded-xl overflow-hidden" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)' }}>
                             <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: 'var(--primary)' }}>
-                                <FontAwesomeIcon icon={item.icon} className="w-3.5 h-3.5 text-white opacity-90" />
-                                <span className="text-sm font-black text-white">{item.label}</span>
+                                <FontAwesomeIcon icon={item.icon} className="w-3.5 h-3.5 opacity-90" style={{ color: 'var(--surface)' }} />
+                                <span className="text-sm font-black" style={{ color: 'var(--surface)' }}>{item.label}</span>
                             </div>
                             {hasSubmenu ? item.submenu.map((sub, i) => {
                                 const isSubActive = pathname === sub.path

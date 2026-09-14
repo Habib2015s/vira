@@ -241,11 +241,11 @@ export default function CreateTicketPage() {
                                                         {form.message ? (
                                                             <div className="flex items-end gap-2 justify-end">
                                                                 <div className="max-w-xs px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm leading-relaxed"
-                                                                     style={{ background: 'var(--primary)', color: '#fff' }}>
+                                                                     style={{ background: 'var(--primary)', color: 'var(--surface)' }}>
                                                                     {form.message}
                                                                 </div>
-                                                                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-black text-xs text-white"
-                                                                     style={{ background: 'var(--primary-hover)' }}>ع</div>
+                                                                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 font-black text-xs"
+                                                                     style={{ background: 'var(--primary-hover)', color: 'var(--surface)' }}>ع</div>
                                                             </div>
                                                         ) : (
                                                             <div className="h-full flex items-center justify-center py-6">
@@ -416,8 +416,8 @@ export default function CreateTicketPage() {
                                         { step: '۴', text: 'تیکت را ارسال کنید' },
                                     ].map(({ step, text }) => (
                                         <div key={step} className="flex items-start gap-3">
-                                            <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 text-white"
-                                                  style={{ background: 'var(--primary)' }}>{step}</span>
+                                            <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0"
+                                                  style={{ background: 'var(--primary)', color: 'var(--surface)' }}>{step}</span>
                                             <p className="text-sm leading-relaxed" style={{ color: 'var(--text-soft)' }}>{text}</p>
                                         </div>
                                     ))}

@@ -202,7 +202,7 @@ export default function PersianDatePicker({
                                                 className="p-2 text-sm font-medium rounded-lg transition-all"
                                                 style={{
                                                     background: isSelected ? 'var(--primary)' : 'transparent',
-                                                    color: isSelected ? '#fff' : isFriday ? 'var(--danger)' : 'var(--text)',
+                                                    color: isSelected ? 'var(--surface)' : isFriday ? 'var(--danger)' : 'var(--text)',
                                                     boxShadow: isSelected ? '0 2px 8px rgba(84,76,207,0.4)' : 'none',
                                                 }}
                                                 onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'var(--surface-2)' }}
@@ -226,8 +226,8 @@ export default function PersianDatePicker({
                                     پاک کردن
                                 </button>
                                 <button type="button" onClick={() => setShowModal(false)}
-                                        className="px-6 py-2 rounded-lg font-bold text-sm text-white transition-colors"
-                                        style={{ background: 'var(--primary)' }}
+                                        className="px-6 py-2 rounded-lg font-bold text-sm transition-colors"
+                                        style={{ background: 'var(--primary)', color: 'var(--surface)' }}
                                         onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-hover)'}
                                         onMouseLeave={e => e.currentTarget.style.background = 'var(--primary)'}>
                                     تایید

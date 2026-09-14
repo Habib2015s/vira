@@ -163,7 +163,7 @@ export default function TmRequestShowPage() {
                             {s === 'accepted' && <button onClick={() => handleStatus('reject')} disabled={statusMutation.isPending} className="btn btn-danger btn-sm"><FontAwesomeIcon icon={faTimes} className="w-3.5 h-3.5" />رد</button>}
                             {(s === 'request' || s === 'rejected') && <button onClick={() => handleStatus('toWaiting')} disabled={statusMutation.isPending} className="btn btn-warning btn-sm"><FontAwesomeIcon icon={faClock} className="w-3.5 h-3.5" />انتظار</button>}
                             {s === 'accepted' && <button onClick={() => handleStatus('toDeparture')} disabled={statusMutation.isPending} className="btn btn-success btn-sm"><FontAwesomeIcon icon={faTruck} className="w-3.5 h-3.5" />ترخیص</button>}
-                            {s === 'departure' && <button onClick={() => handleStatus('rollbackToAccepted')} disabled={statusMutation.isPending} className="btn btn-sm" style={{ background: 'var(--primary)', color: '#fff' }}><FontAwesomeIcon icon={faRotateLeft} className="w-3.5 h-3.5" />بازگشت</button>}
+                            {s === 'departure' && <button onClick={() => handleStatus('rollbackToAccepted')} disabled={statusMutation.isPending} className="btn btn-sm" style={{ background: 'var(--primary)', color: 'var(--surface)' }}><FontAwesomeIcon icon={faRotateLeft} className="w-3.5 h-3.5" />بازگشت</button>}
                             <button onClick={handleDelete} disabled={deleteMutation.isPending} className="btn btn-danger btn-sm">
                                 <FontAwesomeIcon icon={deleteMutation.isPending ? faSpinner : faTrash} className={`w-3.5 h-3.5 ${deleteMutation.isPending ? 'animate-spin' : ''}`} />حذف
                             </button>
@@ -329,7 +329,7 @@ export default function TmRequestShowPage() {
                                                             : state.isSelected
                                                                 ? 'var(--primary)'
                                                                 : 'transparent',
-                                                        color: state.isSelected ? '#fff' : 'var(--text)',
+                                                        color: state.isSelected ? 'var(--surface)' : 'var(--text)',
                                                         cursor: 'pointer'
                                                     }),
                                                     singleValue: (base) => ({
