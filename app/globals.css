@@ -8,7 +8,8 @@
     /* ── مونوکروم کامل: مشکی / سفید / خاکستری ──
        فقط شاخص‌های آماری/چارت (success/warning/danger پایین) رنگی می‌مونن؛
        دکمه‌ها، breadcrumb و بقیهٔ عناصر تعاملی خاکستری/مشکی/سفیدن. */
-    --primary:        #18181b;
+    --primary: #595959;
+    --primary-foreground: #ffffff;
     --primary-hover:  #000000;
     --primary-light:  #e4e4e7;
     --primary-subtle: #f4f4f5;
@@ -59,6 +60,7 @@
    ═══════════════════════════════════════════════════ */
 
 .dark, [data-theme="dark"] {
+    --primary-foreground: #09090b;
     --primary:        #e4e4e7;
     --primary-hover:  #ffffff;
     --primary-light:  #27272a;
@@ -336,8 +338,9 @@ body {
     padding: 14px 24px;
     box-shadow: var(--shadow-md);
 }
+
 .dark .page-header-bar, [data-theme="dark"] .page-header-bar {
-    background: #000000;
+    background: #414040;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 .page-content { padding: 18px 12px 20px 20px; max-width: 100%; margin: 0; } /* padding-right کوچیک چون سمت راست به سایدبار می‌چسبد */

@@ -171,7 +171,7 @@ export default function DirectRequestPage() {
                                 <div>
                                     <p className="font-bold">دریافت لیست مراکز هزینه ناموفق بود: {centersError.message}</p>
                                     <p className="mt-1" style={{ color: 'var(--text-muted)' }}>
-                                        اگه این خطا ادامه داشت، احتمالاً endpoint واقعی «مرکز هزینه» با account-sides فرق داره — باید از بک‌اند بپرسی مسیر درست چیه.
+                                        ،  endpoint واقعی «مرکز هزینه» با account-sides فرق داره .
                                     </p>
                                 </div>
                             </div>

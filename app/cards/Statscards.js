@@ -50,12 +50,12 @@ export default function StatsCards() {
                         <motion.button key={cat.id} onClick={() => setActiveTab(cat.id)}
                             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                             className="relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all overflow-hidden"
-                            style={{
-                                background: isActive ? 'var(--primary)' : 'var(--surface)',
-                                color: isActive ? '#fff' : 'var(--text-soft)',
-                                border: `1px solid ${isActive ? 'var(--primary)' : 'var(--border)'}`,
-                                boxShadow: isActive ? '0 4px 12px rgba(79,70,229,0.3)' : 'var(--shadow-sm)'
-                            }}
+                                       style={{
+                                           background: isActive ? 'var(--primary)' : 'var(--surface)',
+                                           color: isActive ? 'var(--primary-foreground)' : 'var(--text-soft)',
+                                           border: `1px solid ${isActive ? 'var(--primary)' : 'var(--border)'}`,
+                                           boxShadow: isActive ? '0 4px 12px rgba(79,70,229,0.3)' : 'var(--shadow-sm)'
+                                       }}
                         >
                             <FontAwesomeIcon icon={cat.icon} className="w-4 h-4" />
                             {cat.label}
